@@ -46,7 +46,12 @@ h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,6vw,64px);l
 .hero-link{font-family:Inter,sans-serif;font-size:14.5px;margin:10px 0 0}
 .controls{position:sticky;top:0;z-index:20;background:var(--bg);padding:14px 0 10px;border-bottom:1px solid var(--line)}
 @media (max-width:640px){ .controls{position:static} }
-.search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;min-height:44px}
+.search{width:100%;padding:12px 48px 12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;min-height:44px}
+.search-wrap{position:relative}
+.search-clear{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:32px;height:32px;min-width:32px;min-height:32px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--muted);font-size:15px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.search-clear.visible{display:inline-flex}
+.search-clear:hover,.search-clear:active{background:var(--line);color:var(--ink);border-color:var(--muted)}
+.search-clear:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
 .filters button{min-height:38px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;cursor:pointer;font-size:13.5px}
 .filters button.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -164,7 +169,7 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
     <p class="hero-link">Looking for what's going on? <a href="https://events.fiddletowngazette.com/">Browse the Gold Country events calendar →</a></p>
   </div>
   <div class="controls">
-    <input class="search" id="q" type="search" placeholder="Search places — try “distillery”, “Volcano”, “burger”…" aria-label="Search places">
+    <div class="search-wrap"><input class="search" id="q" type="search" placeholder="Search places — try “distillery”, “Volcano”, “burger”…" aria-label="Search places"><button type="button" class="search-clear" id="q-clear" aria-label="Clear search" title="Clear search" hidden>&#10005;</button></div>
     <div class="filters" id="pills" role="group" aria-label="Filter by kind of place"></div>
     <div class="filters towns" id="towns" role="group" aria-label="Filter by town"></div>
     <div class="count" id="count" aria-live="polite"></div>
@@ -780,10 +785,21 @@ document.addEventListener('keydown', function(e){
 /* ---------- controls ---------- */
 qEl.value=state.q;
 var qTimer=null;
+var qClear=$('q-clear');
+function updateQClear(){ if(!qClear) return; var has=!!(qEl.value&&qEl.value.length); qClear.classList.toggle('visible',has); qClear.hidden=!has; }
 qEl.addEventListener('input', function(){
+  updateQClear();
   clearTimeout(qTimer);
   qTimer=setTimeout(function(){ state.q=qEl.value; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); }, 160);
 });
+if(qClear){ qClear.addEventListener('click', function(){
+  /* Clear ONLY the text — category/town pills keep their state, exactly as
+     if the characters had been deleted by hand (Dave, Nov 24, 2026). */
+  qEl.value=''; clearTimeout(qTimer);
+  state.q=''; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults();
+  updateQClear(); qEl.focus();
+}); }
+updateQClear();
 moreBtn.addEventListener('click', function(){ state.shown+=PAGE; renderGrid(false); });
 window.addEventListener('resize', (function(){ var t; return function(){ clearTimeout(t); t=setTimeout(function(){ if(dataReady && !currentDetail) renderGrid(false); }, 250); }; })());
 
