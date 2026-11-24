@@ -544,34 +544,74 @@ function renderPills(){
 }
 var townsOpen=false;
 var TOWN_CAP=24;
+var NEARBY_N=5;
+/* Town centroids from the records' own coordinates, for the nearest-towns
+   handful in the collapsed selected-form row (Dave, Nov 24, 2026). */
+var townCentroids=null;
+function computeCentroids(){
+  var acc={};
+  rows.forEach(function(r){
+    if(r.latitude==null || r.longitude==null || !r.city) return;
+    var a=acc[r.city]||(acc[r.city]={la:0, lo:0, n:0});
+    a.la+=r.latitude; a.lo+=r.longitude; a.n++;
+  });
+  townCentroids={};
+  for(var t in acc) townCentroids[t]={la:acc[t].la/acc[t].n, lo:acc[t].lo/acc[t].n};
+}
+function nearestTowns(town, counts){
+  var c0=townCentroids && townCentroids[town];
+  if(!c0) return [];
+  var list=[];
+  for(var t in counts){
+    if(t===town) continue;
+    var c=townCentroids[t];
+    if(!c) continue;
+    var dla=c.la-c0.la, dlo=(c.lo-c0.lo)*Math.cos(c0.la*Math.PI/180);
+    list.push({t:t, d:dla*dla+dlo*dlo});
+  }
+  list.sort(function(a,b){ return a.d-b.d || (a.t<b.t?-1:1); });
+  return list.slice(0, NEARBY_N).map(function(x){ return x.t; });
+}
+/* Town pill row (Dave's collapse design, Nov 24, 2026): single-select, so
+   the row adapts to the selection. Default: All towns + the top-TOWN_CAP
+   group by count + a "more towns" pill. Expanded: the full list, while
+   choosing. Once a town is picked the row collapses again — to the default
+   row when the pick is in the main group, or, for an out-of-group pick, to
+   All towns + the pick + its NEARBY_N nearest towns by centroid. Tapping
+   All towns always returns to the default row. The mode derives from state
+   on every render, so a persisted out-of-group selection reloads in the
+   collapsed selected-form, never as the full wall. Supersedes the Nov 24
+   morning cap condition (which left filtered views uncapped): the collapse
+   now holds under category filters and search too, with every town still
+   one tap away behind the expander. */
 function renderTowns(){
   var counts=facetTowns();
   if(state.town && !counts[state.town]){ state.town=''; saveState(); }
   var names=Object.keys(counts).sort();
-  /* The cap exists to tame the unfiltered all-places town list (90+ towns).
-     Under a category filter or a search the town list is already the narrowed
-     set the reader is browsing — capping it there hid small towns entirely
-     (Sutter Creek ranked 27th of 28 pizza towns, so its pill vanished behind
-     the expander and Gold Dust Pizza looked missing). Dave, Nov 24, 2026. */
-  var many=names.length>TOWN_CAP && state.cat==='all' && !state.q;
-  var shown=names;
-  if(many && !townsOpen){
-    var byCount=names.slice().sort(function(a,b){ return counts[b]-counts[a] || (a<b?-1:1); });
-    var keep={};
-    byCount.slice(0,TOWN_CAP).forEach(function(t){ keep[t]=1; });
-    if(state.town) keep[state.town]=1;
-    shown=names.filter(function(t){ return keep[t]; });
+  var byCount=names.slice().sort(function(a,b){ return counts[b]-counts[a] || (a<b?-1:1); });
+  var mainGroup=byCount.slice(0, TOWN_CAP);
+  var mainSet={}; mainGroup.forEach(function(t){ mainSet[t]=1; });
+  var many=names.length>TOWN_CAP;
+  var shown, toggleLabel=null;
+  if(townsOpen){
+    shown=names;
+    if(many) toggleLabel='Show fewer towns';
+  } else if(!state.town || mainSet[state.town]){
+    shown=mainGroup.slice().sort();
+    if(many) toggleLabel='+ '+(names.length-mainGroup.length)+' more towns';
+  } else {
+    shown=[state.town].concat(nearestTowns(state.town, counts));
   }
   var html='<button type="button" data-town="" class="'+(state.town===''?'active':'')+'" aria-pressed="'+(state.town==='')+'">All towns</button>';
   shown.forEach(function(t){
     html+='<button type="button" data-town="'+esc(t)+'" class="'+(state.town===t?'active':'')+'" aria-pressed="'+(state.town===t)+'">'+esc(t)+' ('+counts[t]+')</button>';
   });
-  if(many){
-    html+='<button type="button" data-towns-toggle="1" class="towns-toggle" aria-expanded="'+townsOpen+'">'+(townsOpen?'Show fewer towns':'+ '+(names.length-shown.length)+' more towns')+'</button>';
+  if(toggleLabel){
+    html+='<button type="button" data-towns-toggle="1" class="towns-toggle" aria-expanded="'+townsOpen+'">'+toggleLabel+'</button>';
   }
   townsEl.innerHTML=html;
   townsEl.querySelectorAll('button[data-town]').forEach(function(b){
-    b.addEventListener('click', function(){ state.town=b.getAttribute('data-town'); state.shown=PAGE; saveState(); renderTowns(); renderGrid(true); scrollToResults(); });
+    b.addEventListener('click', function(){ state.town=b.getAttribute('data-town'); townsOpen=false; state.shown=PAGE; saveState(); renderTowns(); renderGrid(true); scrollToResults(); });
   });
   var tg=townsEl.querySelector('button[data-towns-toggle]');
   if(tg) tg.addEventListener('click', function(){ townsOpen=!townsOpen; renderTowns(); });
@@ -946,6 +986,7 @@ loadLocations().then(function(all){
     r._hay=normName([r.name,r.city,r.region,r.address,r.short_description].join(' '));
   });
   rows.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  computeCentroids();
   dataReady=true;
   (function(){
     var towns={}, counties={};
