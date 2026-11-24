@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gold Country Locations — Every Place in the Database</title>
+<meta name="description" content="Browse every place in the Gold Country events database: historical markers, wineries, restaurants, diners and sights across the Mother Lode and the Sierra foothills — each with its own page.">
+<link rel="canonical" href="https://events.fiddletowngazette.com/locations.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fiddletown Gazette">
+<meta property="og:title" content="Places of the Gold Country — Every Place in the Database">
+<meta property="og:description" content="Browse every place in the Gold Country database: historical markers, wineries, restaurants, diners and sights across the Mother Lode and the Sierra foothills — each with its own page.">
+<meta property="og:url" content="https://events.fiddletowngazette.com/locations.html">
+<meta property="og:image" content="https://events.fiddletowngazette.com/places-icon-512.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/places-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/places-favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/places-favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/places-apple-touch-icon.png">
+<link rel="manifest" href="/places.webmanifest">
+<meta name="theme-color" content="#fffdf7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Inter:wght@400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fffdf7; --paper:#fffaf0; --card:#ffffff; --ink:#241a12; --muted:#6b5d4f; --line:#e8ddc9;
+  --gold:#b7791f; --gold-bg:#fff3cf; --rust:#9c3d1e; --rust-bg:#fdeee8; --teal:#2f5d50; --teal-bg:#e6f0eb;
+  --chip:#f3ead6; --shadow:0 10px 30px rgba(60,35,0,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#171310; --paper:#1e1915; --card:#241e19; --ink:#f5ead8; --muted:#c9b8a3; --line:#3d332a; --gold:#e9b44c; --gold-bg:#332a15; --rust:#ff9a7a; --rust-bg:#3a2018; --teal:#8fd0b8; --teal-bg:#1e332c; --chip:#2e2720; --shadow:0 10px 30px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Serif 4",Georgia,serif;line-height:1.55}
+a{color:var(--rust)} button,input,select{font-family:Inter,system-ui,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px 48px}
+.hero{padding:28px 0 8px}
+.hero-brand{display:flex;align-items:center;gap:16px;margin:10px 0 12px}
+.hero-icon{width:clamp(50px,7vw,72px);height:auto;flex:none;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.hero-brand h1{margin:0}
+.kicker{font-family:Inter,sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,6vw,64px);line-height:.95;margin:10px 0 12px;letter-spacing:-.02em}
+.lede{font-size:19px;max-width:720px;color:var(--muted)}
+.lede strong{color:var(--ink)}
+.hero-link{font-family:Inter,sans-serif;font-size:14.5px;margin:10px 0 0}
+.controls{position:sticky;top:0;z-index:20;background:var(--bg);padding:14px 0 10px;border-bottom:1px solid var(--line)}
+@media (max-width:640px){ .controls{position:static} }
+.search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;min-height:44px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.filters button{min-height:38px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;cursor:pointer;font-size:13.5px}
+.filters button.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.filters button:focus-visible,.search:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.towns{margin-top:8px}
+.towns button{font-size:12.5px;min-height:34px;padding:6px 11px}
+.towns button.towns-toggle{border-style:dashed;font-weight:600}
+.count{font-family:Inter,sans-serif;font-size:13px;color:var(--muted);margin-top:10px}
+.count:empty{margin:0}
+.grid{margin-top:18px}
+.grid-cols{display:flex;gap:16px;align-items:flex-start}
+.grid-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:16px}
+@media(max-width:760px){.grid-cols{flex-direction:column}.grid-col{width:100%}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;border-top:6px solid var(--gold);position:relative;scroll-margin-top:16px;width:100%}
+.card[data-cat="marker"]{border-top-color:var(--teal)}
+.card[data-cat="winery"]{border-top-color:var(--rust)}
+.card[data-cat="food"]{border-top-color:var(--gold)}
+.card[data-cat="sight"]{border-top-color:var(--ink)}
+.card.hash-highlight{outline:3px solid var(--gold);outline-offset:3px;box-shadow:0 0 0 7px var(--gold-bg),var(--shadow)}
+.photofig{margin:0}
+.photo-btn{display:block;width:100%;padding:0;border:0;background:none;cursor:pointer}
+.photo-btn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.cardphoto{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--chip)}
+.credit{font-family:Inter,sans-serif;font-size:11px;color:var(--muted);padding:6px 16px 0;margin:0}
+.cardbody{padding:14px 16px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.meta{font-family:Inter,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.meta .evcount{color:var(--teal);white-space:nowrap}
+.card h3{font-family:"Playfair Display",serif;font-size:24px;line-height:1.08;margin:0}
+.card-title-link{cursor:pointer}
+.card-title-link:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.card-title-link:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:4px}
+.area{font-family:Inter,sans-serif;font-size:13px;color:var(--muted);margin:0}
+.addr{font-family:Inter,sans-serif;font-size:13px;color:var(--muted);margin:0}
+.desc{color:var(--muted);font-size:15.5px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-actions{display:flex;gap:8px;margin-top:auto;padding-top:10px;align-items:stretch}
+.details-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 13px;border-radius:10px;border:1.5px solid var(--gold);background:var(--gold-bg);color:var(--ink);font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;flex:1 1 auto;text-decoration:none}
+.details-btn:hover{border-color:var(--ink)}
+.details-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.copy-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 13px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.copy-btn:hover{border-color:var(--muted)}
+.copy-btn.copied{border-color:var(--teal);color:var(--teal)}
+.copy-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.morewrap{text-align:center;margin-top:22px}
+.more-btn{min-height:44px;padding:11px 22px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow)}
+.more-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.empty{font-family:Inter,sans-serif;color:var(--muted);text-align:center;padding:34px 10px;font-size:15px}
+footer{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);margin-top:28px;line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
+.hidden{display:none!important}
+/* ---------- photo viewer (full-screen, drag-down to dismiss) ---------- */
+.viewer{position:fixed;inset:0;z-index:120;background:rgba(12,9,6,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;touch-action:none}
+.viewer[hidden]{display:none}
+.viewer img{max-width:96vw;max-height:84vh;object-fit:contain;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.viewer-cap{color:#f5ead8;font-family:Inter,sans-serif;font-size:13.5px;margin:12px 0 0;text-align:center}
+.viewer-close{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer;line-height:1;z-index:2}
+.viewer-close:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.viewer-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;will-change:transform;max-width:100%}
+.viewer-hint{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:rgba(245,234,216,.6);font-family:Inter,sans-serif;font-size:12.5px;margin:0;pointer-events:none}
+/* ---------- detail view ---------- */
+#detail-view .detail-wrap{max-width:860px;margin:0 auto;padding:20px 18px 56px}
+.back-btn{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow)}
+.back-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.detail-photofig{margin:18px 0 0}
+.detail-photo-btn{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;border-radius:14px}
+.detail-photo-btn img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;background:var(--chip)}
+.detail-photo-btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.detail-photofig .credit{padding:6px 2px 0}
+.detail-nophoto{font-family:Inter,sans-serif;font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;margin:18px 0 0}
+.detail-meta{margin-top:18px}
+.detail-title{font-family:"Playfair Display",Georgia,serif;font-size:clamp(30px,5vw,42px);line-height:1.05;margin:6px 0 10px}
+.detail-desc{font-size:17px;color:var(--ink);white-space:pre-wrap}
+.detail-info{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 18px;box-shadow:var(--shadow)}
+.info-row{display:flex;gap:16px;padding:12px 0;border-bottom:1px dashed var(--line);font-family:Inter,sans-serif;font-size:15px}
+.info-row:last-child{border-bottom:0}
+.info-label{flex:0 0 86px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding-top:3px}
+.info-value{flex:1 1 auto;line-height:1.55;min-width:0}
+.info-value a{font-weight:600}
+.info-sub{display:block;font-size:12.5px;color:var(--muted)}
+.detail-actions{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
+.detail-events{margin-top:24px}
+.detail-events h2{font-family:"Playfair Display",serif;font-size:24px;margin:0 0 10px}
+.evrow{display:flex;gap:12px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow)}
+.evrow:hover{border-color:var(--gold)}
+.evrow .evname{font-weight:700;font-size:15.5px}
+.evrow .evwhen{font-family:Inter,sans-serif;font-size:13px;color:var(--muted);white-space:nowrap}
+.detail-loading{font-family:Inter,sans-serif;color:var(--muted);padding:40px 0;font-size:15px}
+.detail-bottom{margin-top:26px}
+a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="list-view">
+  <div class="hero">
+    <div class="hero-brand">
+      <img class="hero-icon" src="/icon-places.svg" alt="Gold Country Locations icon — a gold map pin with a star cut into it" width="72" height="72">
+      <div>
+        <div class="kicker">Gold Country · Places</div>
+        <h1>Places of the Gold Country</h1>
+      </div>
+    </div>
+    <p class="lede">Every place in the database — <strong>historical markers, wineries, diners, distilleries and sights</strong> across the Mother Lode and the Sierra foothills. Every place has its own page; tap a card for the full story, or copy its link to share it.</p>
+    <p class="hero-link">Looking for what's going on? <a href="https://events.fiddletowngazette.com/">Browse the Gold Country events calendar →</a></p>
+  </div>
+  <div class="controls">
+    <input class="search" id="q" type="search" placeholder="Search places — try “distillery”, “Volcano”, “burger”…" aria-label="Search places">
+    <div class="filters" id="pills" role="group" aria-label="Filter by kind of place"></div>
+    <div class="filters towns" id="towns" role="group" aria-label="Filter by town"></div>
+    <div class="count" id="count" aria-live="polite"></div>
+  </div>
+  <div class="grid" id="grid"><p class="empty" id="loading">Loading places…</p></div>
+  <div class="morewrap"><button class="more-btn hidden" id="more" type="button">Show more places</button></div>
+  <footer>Places are drawn live from the Gold Country events database — the same records the Fiddletown Gazette prints from. Marker texts and photos come from the Historical Marker Database (HMdb) unless credited otherwise. <a href="https://events.fiddletowngazette.com/">Events calendar →</a></footer>
+</div>
+
+<div id="detail-view" hidden>
+  <div class="detail-wrap">
+    <button class="back-btn" id="detail-back" type="button">← All places</button>
+    <p class="detail-loading" id="detail-loading">Loading this place…</p>
+    <div id="detail-body" hidden>
+      <figure class="detail-photofig" id="detail-photofig">
+        <button class="detail-photo-btn" id="detail-photo-btn" type="button"><img id="detail-img" alt=""></button>
+        <figcaption class="credit" id="detail-credit"></figcaption>
+      </figure>
+      <p class="detail-nophoto" id="detail-nophoto" hidden>No photo on file for this place yet.</p>
+      <div class="detail-meta meta" id="detail-meta"></div>
+      <h1 class="detail-title" id="detail-title"></h1>
+      <p class="detail-desc" id="detail-desc"></p>
+      <div class="detail-info" id="detail-info"></div>
+      <div class="detail-actions">
+        <button class="copy-btn" id="detail-copy" type="button">🔗 <span>Copy link</span></button>
+        <a class="details-btn hidden" id="detail-dir" target="_blank" rel="noopener">Directions →</a>
+        <a class="details-btn hidden" id="detail-web" target="_blank" rel="noopener">Visit website →</a>
+        <a class="details-btn hidden" id="detail-burger" target="_blank" rel="noopener">🍔 The burger story →</a>
+      </div>
+      <div class="detail-events" id="detail-events" hidden>
+        <h2>Upcoming events here</h2>
+        <div id="detail-events-list"></div>
+      </div>
+      <div class="detail-bottom"><button class="back-btn" id="detail-back-2" type="button">← All places</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="viewer-close" id="viewer-close" type="button" aria-label="Close photo viewer">✕</button>
+  <div class="viewer-stage" id="viewer-stage">
+    <img id="viewer-img" alt="">
+    <p class="viewer-cap" id="viewer-cap"></p>
+  </div>
+  <p class="viewer-hint">Drag down or tap ✕ to close</p>
+</div>
+
+<script async src="https://visitor-counter.dave-5d7.workers.dev/beacon.js" data-site="gold-country-events"></script>
+<script>
+(function(){
+"use strict";
+var ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZnRjZWJhZnRuZ2NkanZ4cmdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDA5NDcsImV4cCI6MjA3NjExNjk0N30.8AlcsUMJSxBlua-ehaGLAn69bbORoMBdjM--MSxxXF0';
+var BASE = 'https://ydftcebaftngcdjvxrgl.supabase.co/rest/v1/';
+var SHARE_BASE = 'https://events.fiddletowngazette.com/locations.html';
+var EVENTS_URL = 'https://events.fiddletowngazette.com/';
+var PAGE = 48;
+var LS_KEY = 'gcloc.filters.v1';
+
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function normName(s){ return (s||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim(); }
+
+/* ---------- categories (client-side derivation; the live table has no category column) ---------- */
+var WINERY_NAMES = {'lusso della terra':1, 'chateau davell':1, 'home of the zin man':1, 'cantiga wineworks':1};
+function categoryOf(r){
+  var host = '';
+  try{ host = r.website_url ? new URL(r.website_url).hostname.replace(/^www\./,'') : ''; }catch(e){}
+  if(host === 'hmdb.org') return 'marker';
+  var n = (r.name||'').toLowerCase();
+  if(WINERY_NAMES[n]) return 'winery';
+  if(/winery|vineyard|cellars|wines|estate|vino|château/.test(n)) return 'winery';
+  if(/inn|pub|restaurant|cafe|café|grill|bakery|brew|kitchen|tavern|saloon|hotel|motel|lodge|diner|burger|eats|frosty|deli|coffee|distill|bistro|drive-in/.test(n)) return 'food';
+  return 'sight';
+}
+var CATS = [
+  {id:'all',   label:'All places'},
+  {id:'marker',label:'Historical markers'},
+  {id:'winery',label:'Wineries & vineyards'},
+  {id:'food',  label:'Food, drink & stays'},
+  {id:'burger',label:'Burger joints'},
+  {id:'pizza', label:'Pizza joints'},
+  {id:'saloon',label:'Saloons'},
+  {id:'roadhouse', label:'Roadhouses'},
+  {id:'chinese', label:'Chinese'},
+  {id:'asian', label:'Asian'},
+  {id:'italian', label:'Italian'},
+  {id:'steakhouse', label:'Steakhouse'},
+  {id:'other', label:'Other'},
+  {id:'sight', label:'Sights & viewpoints'}
+];
+var CAT_LABEL = {marker:'Historical marker', winery:'Winery & vineyard', food:'Food, drink & stays', sight:'Sights & viewpoints'};
+var TAGS = {
+  burger: {"ikedas":1,"friar-tucks":1,"wise-villa-winery":1,"old-town-grill":1,"shoestring":1,"88-giant-burgers-to-go":1,"kennedys-pioneer-burger":1,"mel-and-fayes-diner":1,"sizemores-country-store":1,"cavanas-pub-and-grub":1,"marlene-and-glens-diner":1,"helwig-winery":1,"villa-toscano-winery-bistro":1,"the-end-of-nowhere":1,"websters-country-burger-drive-in":1,"frosty":1,"ironstone-vineyards":1,"diamondback-grill":1,"jamestown-frosty":1,"lake-alpine-lodge":1,"walker-burger":1,"bootleggers-old-town-tavern":1,"south-pine-cafe":1,"giant-burger-arnold":1,"rojos-tavern":1,"sno-flake-drive-in":1,"tahoe-bros-charbroiled-burgers":1,"cold-water-brewery-and-grill":1,"california-burger-company":1,"cutthroat-tavern":1,"buena-vista-store":1,"acorn-ridge-casino-stonecreek-kitchen":1,"angies-place":1,"patio-drive-in":1,"crazy-eddies-panini-grill":1,"gooneys-bar-and-grill":1,"murphys-pourhouse":1,"cooks-station":1,"hams-station-cafe":1,"the-lube-room-saloon":1,"lucky-beaver-bar-and-burger":1,"burger-lounge":1,"berts-caf\u00e9":1,"flight-deck-grill-and-golf-club":1},
+  pizza: {"gold-dust-pizza":1,"round-table-pizza-jackson":1,"rays-take-and-bake-pizza-jackson":1,"rays-take-and-bake-pizza-pioneer":1,"pine-grove-pizza":1,"paisanos-pizzeria":1,"crush-pizzeria":1,"moonrise-pizza":1,"mikes-pizza":1,"round-table-pizza-angels-camp":1,"murphys-pizza-co":1,"pizza-factory-arnold":1,"rolling-dough-pizza":1,"casa-piedra-pizzeria":1,"round-table-pizza-valley-springs":1,"firewood":1,"st-charles-saloon":1,"round-table-pizza-placerville":1,"pizza-factory-placerville":1,"bene-ristorante-italiano":1,"spankys-pizza":1,"pizza-plus-placerville":1,"indian-pizza-and-bar":1,"pizza-norcia":1,"wallys-pizza-bar":1,"pizza-factory-cameron-park":1,"base-camp-pizza-co":1,"lake-tahoe-pizza-company":1,"slice-of-sierra-pizza":1,"round-table-pizza-south-lake-tahoe":1,"blue-dog-pizza-midtown":1,"blue-dog-pizza-stateline":1,"old-town-pizza-auburn":1,"coyote-pizzeria":1,"round-table-pizza-auburn":1,"main-street-pizza-colfax":1,"il-pizzaiolo":1,"lamppost-pizza":1,"tuscany-gardens-pizzeria":1,"bicycle-thief":1,"round-table-pizza-grass-valley":1,"miner-moes-pizza":1,"three-forks-bakery-and-brewing":1,"the-pizza-joint":1,"mikes-pizza-of-sonora":1,"round-table-pizza-sonora":1,"pizza-factory-twain-harte":1,"pizza-plus-jamestown":1,"formaggio-pizza-express":1,"sierra-taphouse-and-pizza":1,"emberz":1,"pizza-factory-mariposa":1,"mariposa-take-n-bake-pizza":1,"the-grove-house":1},
+  saloon: {"buena-vista-store":1,"the-lube-room-saloon":1,"murphys-historic-hotel-and-saloon":1,"branding-iron-saloon":1,"iron-door-saloon":1,"jack-douglass-saloon":1,"st-charles-saloon":1,"golden-gate-saloon-holbrooke-hotel":1,"hotel-leger-restaurant-and-saloon":1,"georgetown-hotel-and-saloon":1,"serventes-saloon":1,"the-national-bar":1,"poor-reds-bar-b-q":1},
+  roadhouse: {"gibsons-roadhouse-cafe":1,"poor-reds-bar-b-q":1,"pjs-roadhouse":1,"miners-roadhouse-140":1}
+};
+/* classifier pills (Dave, Nov 24, 2026): signal-based, not slug lists.
+   Chinese: a cuisine signal in the name, or a cuisine phrase in the description
+   ("Chinese restaurant", "Hunan cuisine", ...) — historic markers and passing
+   mentions in plaque text never match. Italian and Steakhouse are SEPARATE
+   pills (Dave's correction, Nov 24): Italian = Italian-cuisine signals in the
+   name or a cuisine phrase in the description; Steakhouse = steakhouse /
+   steak house / chophouse / prime rib, with a guard so a "Steakhouse burger"
+   on a diner menu doesn't qualify. Other: Food, drink & stays records in no
+   other food pill. */
+var CH_RE = /chinese|china|hunan|szechuan|sichuan|mandarin|cantonese|dim sum|wok|hong kong/i;
+var CH_FOOD_RE = /(chinese|hunan|szechuan|sichuan|cantonese|mandarin|dim sum)[^.!?]{0,30}(restaurant|cuisine|kitchen|food|dishes|menu|takeout|buffet|eatery)|(restaurant|cuisine|kitchen|food|dishes|menu|takeout|buffet|eatery)[^.!?]{0,30}(chinese|hunan|szechuan|sichuan|cantonese|mandarin|dim sum)/i;
+var IT_NAME_RE = /italian|italiano|ristorante|trattoria|osteria|tuscany|tuscan|neapolitan|sicilian|napoli/i;
+var IT_FOOD_RE = /(italian|neapolitan|sicilian|tuscan)[^.!?]{0,30}(restaurant|cuisine|kitchen|food|dishes|menu|pizzeria|eatery|dining|market)|(restaurant|cuisine|kitchen|food|dishes|menu|pizzeria|eatery|dining|market)[^.!?]{0,30}(italian|neapolitan|sicilian|tuscan)/i;
+function isChinese(r){
+  if(r._cat==='marker') return false;
+  if(CH_RE.test(r.name||'')) return true;
+  return CH_FOOD_RE.test(r.short_description||'');
+}
+function isItalian(r){
+  if(r._cat==='marker') return false;
+  if(IT_NAME_RE.test(r.name||'')) return true;
+  return IT_FOOD_RE.test(r.short_description||'');
+}
+function isSteakhouse(r){
+  if(r._cat==='marker') return false;
+  var t=(r.name||'')+' '+(r.short_description||'');
+  if(/prime rib|chophouse|steak house/i.test(t)) return true;
+  if(/steakhouse/i.test(t) && !/steakhouse[^.!?]{0,60}burgers?\b/i.test(t)) return true;
+  return false;
+}
+/* Asian (Dave, Nov 24): the umbrella over every Asian-cuisine restaurant —
+   all of Chinese, plus Japanese/sushi, Thai, Vietnamese, Korean, Indian,
+   Nepalese/Himalayan, Laotian, Filipino-led and Mongolian places. Strong
+   signals match on the name; 'indian|desi|lao' are weak name signals gated
+   to the food category (so Indian Grinding Rock, a sight, stays out);
+   otherwise a cuisine phrase in the description. 'pho' is word-bounded —
+   as a bare substring it hides inside "Taphouse". */
+var AS_STRONG_RE = /japanese|sushi|ramen|izakaya|teriyaki|hibachi|teppanyaki|thai|vietnamese|\bpho\b|korean|tandoori|chaat|masala|biryani|himalaya|mongolian|asian|nepal/i;
+var AS_WEAK_RE = /indian|desi|lao/i;
+var AS_FOOD_RE = /(japanese|thai|vietnamese|korean|indian|nepalese|nepali|laotian|filipino|sushi|ramen|\bpho\b|mongolian|himalayan)[^.!?]{0,30}(restaurant|cuisine|kitchen|food|dishes|menu|eatery|grill|bar|cafe|café|house|bistro)|(restaurant|cuisine|kitchen|food|dishes|menu|eatery|grill|bar|cafe|café|house|bistro)[^.!?]{0,30}(japanese|thai|vietnamese|korean|indian|nepalese|nepali|laotian|filipino|sushi|ramen|\bpho\b|mongolian|himalayan)/i;
+function isAsian(r){
+  if(r._cat==='marker') return false;
+  if(isChinese(r)) return true;
+  if(AS_STRONG_RE.test(r.name||'')) return true;
+  if(r._cat==='food' && AS_WEAK_RE.test(r.name||'')) return true;
+  return AS_FOOD_RE.test(r.short_description||'');
+}
+var TAGFNS = {
+  chinese: isChinese,
+  asian: isAsian,
+  italian: isItalian,
+  steakhouse: isSteakhouse,
+  other: function(r){
+    if(r._cat!=='food') return false;
+    for(var t in TAGS){ if(TAGS[t][r.slug]) return false; }
+    return !isChinese(r) && !isAsian(r) && !isItalian(r) && !isSteakhouse(r);
+  }
+};
+function inCat(r, cat){
+  if(cat==='all') return true;
+  if(TAGS[cat]) return !!TAGS[cat][r.slug];
+  if(TAGFNS[cat]) return TAGFNS[cat](r);
+  return r._cat===cat;
+}
+
+
+/* ---------- state ---------- */
+var rows = [], bySlug = {}, evByLoc = {}, eventsLoaded = false;
+var state = { q:'', cat:'all', town:'', shown: PAGE };
+try{
+  var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+  if(saved){ state.q = saved.q||''; state.cat = saved.cat||'all'; state.town = saved.town||''; }
+}catch(e){}
+function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({q:state.q, cat:state.cat, town:state.town})); }catch(e){} }
+
+/* ---------- elements ---------- */
+var $ = function(id){ return document.getElementById(id); };
+var listView=$('list-view'), detailView=$('detail-view'), grid=$('grid'), countEl=$('count'),
+    pillsEl=$('pills'), townsEl=$('towns'), qEl=$('q'), moreBtn=$('more');
+
+/* ---------- routing (burger-guide pattern: dual route ?place=<slug> + #/place/<slug>) ---------- */
+function routeSlug(){
+  var h = window.location.hash || '';
+  var m = h.match(/^#\/place\/(.+)$/);
+  if(m){ var s=m[1]; try{ s=decodeURIComponent(s); }catch(e){} return s; }
+  try{ var q = new URLSearchParams(window.location.search).get('place'); if(q) return q; }catch(e){}
+  var b = h.replace(/^#/,'');
+  return b || null;
+}
+var currentDetail = null, currentPhoto = null, sessionNav = false, coldDetail = false, savedScrollY = 0, dataReady = false;
+
+function detailURL(slug){ return SHARE_BASE + '?place=' + encodeURIComponent(slug) + '#/place/' + encodeURIComponent(slug); }
+
+/* ---------- copy link ---------- */
+function copyText(text, done){
+  function fallback(){
+    var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta); done(ok);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){ done(true); }, fallback); }
+  else fallback();
+}
+function wireCopy(btn, getSlug){
+  var timer=null;
+  btn.addEventListener('click', function(ev){
+    ev.stopPropagation();
+    var slug = (typeof getSlug==='function') ? getSlug() : getSlug;
+    if(!slug) return;
+    var lbl = btn.querySelector('span');
+    copyText(detailURL(slug), function(ok){
+      btn.classList.toggle('copied', ok);
+      if(lbl) lbl.textContent = ok ? 'Link copied' : 'Copy failed — try again';
+      if(timer) clearTimeout(timer);
+      timer=setTimeout(function(){ btn.classList.remove('copied'); if(lbl) lbl.textContent='Copy link'; }, 2200);
+    });
+  });
+}
+
+/* ---------- data ---------- */
+function fetchJSON(url){
+  return fetch(url, {headers:{apikey:ANON_KEY, Authorization:'Bearer '+ANON_KEY}, cache:'no-store'}).then(function(r){
+    if(!r.ok) throw new Error('feed '+r.status); return r.json();
+  });
+}
+function loadLocations(){
+  var fields='id,name,slug,short_description,address,city,region,website_url,phone,latitude,longitude,photo_url,photo_credit';
+  var all=[], off=0;
+  function page(){
+    return fetchJSON(BASE+'locations?select='+fields+'&status=eq.published&order=name.asc&limit=1000&offset='+off).then(function(chunk){
+      all=all.concat(chunk);
+      if(chunk.length===1000){ off+=1000; return page(); }
+      return all;
+    });
+  }
+  return page();
+}
+function loadEvents(){
+  var fields='id,name,slug,host_org,location,start_date,start_time,end_time';
+  var today=new Date(); var iso=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  return fetchJSON(BASE+'events?select='+fields+'&status=eq.published&start_date=gte.'+iso+'&order=start_date.asc,start_time.asc&limit=1000');
+}
+function applyEvents(events){
+  var evs = events.map(function(ev){ return {ev:ev, hn:normName(ev.host_org), ln:normName(ev.location)}; });
+  evByLoc={};
+  rows.forEach(function(r){
+    var rn=r._nn; if(!rn) return;
+    evs.forEach(function(x){
+      var match = (x.hn && x.hn===rn) || (x.ln && (x.ln===rn || (rn.length>=8 && x.ln.indexOf(rn)===0) || (x.ln.length>=8 && rn.indexOf(x.ln)===0) || x.ln.indexOf(rn)>-1));
+      if(match){ (evByLoc[r.slug]=evByLoc[r.slug]||[]).push(x.ev); }
+    });
+  });
+  eventsLoaded=true;
+  renderGrid(false);
+  if(currentDetail) renderDetailEvents(currentDetail);
+}
+
+/* ---------- list rendering ---------- */
+function filtered(){
+  var q=normName(state.q);
+  return rows.filter(function(r){
+    if(!inCat(r, state.cat)) return false;
+    if(state.town && (r.city||'')!==state.town) return false;
+    if(q && r._hay.indexOf(q)===-1) return false;
+    return true;
+  });
+}
+function facetTowns(){
+  var q=normName(state.q), counts={};
+  rows.forEach(function(r){
+    if(!inCat(r, state.cat)) return;
+    if(q && r._hay.indexOf(q)===-1) return;
+    if(r.city) counts[r.city]=(counts[r.city]||0)+1;
+  });
+  return counts;
+}
+function renderPills(){
+  var counts={all:rows.length, marker:0, winery:0, food:0, sight:0, burger:0, pizza:0, saloon:0, roadhouse:0, chinese:0, asian:0, italian:0, steakhouse:0, other:0};
+  rows.forEach(function(r){ counts[r._cat]++; for(var t in TAGS){ if(TAGS[t][r.slug]) counts[t]++; } for(var f in TAGFNS){ if(TAGFNS[f](r)) counts[f]++; } });
+  var html='';
+  CATS.forEach(function(c){
+    html+='<button type="button" data-cat="'+c.id+'" class="'+(state.cat===c.id?'active':'')+'" aria-pressed="'+(state.cat===c.id)+'">'+esc(c.label)+' ('+counts[c.id]+')</button>';
+  });
+  pillsEl.innerHTML=html;
+  pillsEl.querySelectorAll('button[data-cat]').forEach(function(b){
+    b.addEventListener('click', function(){ state.cat=b.getAttribute('data-cat'); state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); });
+  });
+  renderTowns();
+}
+var townsOpen=false;
+var TOWN_CAP=24;
+function renderTowns(){
+  var counts=facetTowns();
+  if(state.town && !counts[state.town]){ state.town=''; saveState(); }
+  var names=Object.keys(counts).sort();
+  var many=names.length>TOWN_CAP;
+  var shown=names;
+  if(many && !townsOpen){
+    var byCount=names.slice().sort(function(a,b){ return counts[b]-counts[a] || (a<b?-1:1); });
+    var keep={};
+    byCount.slice(0,TOWN_CAP).forEach(function(t){ keep[t]=1; });
+    if(state.town) keep[state.town]=1;
+    shown=names.filter(function(t){ return keep[t]; });
+  }
+  var html='<button type="button" data-town="" class="'+(state.town===''?'active':'')+'" aria-pressed="'+(state.town==='')+'">All towns</button>';
+  shown.forEach(function(t){
+    html+='<button type="button" data-town="'+esc(t)+'" class="'+(state.town===t?'active':'')+'" aria-pressed="'+(state.town===t)+'">'+esc(t)+' ('+counts[t]+')</button>';
+  });
+  if(many){
+    html+='<button type="button" data-towns-toggle="1" class="towns-toggle" aria-expanded="'+townsOpen+'">'+(townsOpen?'Show fewer towns':'+ '+(names.length-shown.length)+' more towns')+'</button>';
+  }
+  townsEl.innerHTML=html;
+  townsEl.querySelectorAll('button[data-town]').forEach(function(b){
+    b.addEventListener('click', function(){ state.town=b.getAttribute('data-town'); state.shown=PAGE; saveState(); renderTowns(); renderGrid(true); scrollToResults(); });
+  });
+  var tg=townsEl.querySelector('button[data-towns-toggle]');
+  if(tg) tg.addEventListener('click', function(){ townsOpen=!townsOpen; renderTowns(); });
+}
+function mapsURL(r){
+  if(r.latitude!=null && r.longitude!=null) return 'https://maps.apple.com/?ll='+r.latitude+','+r.longitude+'&q='+encodeURIComponent(r.name);
+  if(r.address) return 'https://maps.apple.com/?q='+encodeURIComponent(r.address);
+  return 'https://maps.apple.com/?q='+encodeURIComponent(r.name+(r.city?', '+r.city+', CA':''));
+}
+function cardHTML(r){
+  var evs=evByLoc[r.slug]||[];
+  var h='<article class="card" id="card-'+esc(r.slug)+'" data-cat="'+r._cat+'">';
+  if(r.photo_url){
+    h+='<figure class="photofig"><button class="photo-btn" type="button" data-goto="'+esc(r.slug)+'" aria-label="View details for '+esc(r.name)+'"><img class="cardphoto" loading="lazy" src="'+esc(r.photo_url)+'" alt="Photo of '+esc(r.name)+'"></button>';
+    if(r.photo_credit) h+='<figcaption class="credit">'+esc(r.photo_credit)+'</figcaption>';
+    h+='</figure>';
+  }
+  h+='<div class="cardbody">';
+  h+='<div class="meta"><span>'+esc(CAT_LABEL[r._cat])+'</span>'+(eventsLoaded && evs.length?'<span class="evcount">'+evs.length+' upcoming event'+(evs.length>1?'s':'')+'</span>':'')+'</div>';
+  h+='<h3 class="card-title-link" data-goto="'+esc(r.slug)+'" tabindex="0" role="link">'+esc(r.name)+'</h3>';
+  var area=[r.city, r.region].filter(Boolean).join(' · ');
+  if(area) h+='<p class="area">'+esc(area)+'</p>';
+  if(r.address) h+='<p class="addr">'+esc(r.address)+'</p>';
+  if(r.short_description) h+='<p class="desc">'+esc(r.short_description)+'</p>';
+  h+='<div class="card-actions"><button class="details-btn" type="button" data-goto="'+esc(r.slug)+'">Details →</button><button class="copy-btn" type="button" data-copy="'+esc(r.slug)+'">🔗 <span>Copy link</span></button></div>';
+  h+='</div></article>';
+  return h;
+}
+function scrollToResults(){
+  var controls=document.querySelector('.controls');
+  var sticky=controls && window.getComputedStyle(controls).position==='sticky';
+  var offset=sticky ? controls.getBoundingClientRect().height : 0;
+  var y=grid.getBoundingClientRect().top + window.scrollY - offset - 8;
+  window.scrollTo(0, Math.max(0, y));
+}
+function renderGrid(reset){
+  if(!dataReady) return;
+  var list=filtered();
+  var total=rows.length;
+  var markers=rows.filter(function(r){return r._cat==='marker';}).length;
+  var photos=rows.filter(function(r){return r.photo_url;}).length;
+  countEl.textContent='Showing '+Math.min(state.shown,list.length)+' of '+list.length+' locations'+(list.length!==total?' (filtered from '+total+')':'')+' · '+total+' in the database ('+markers+' markers · '+photos+' with photos)';
+  var slice=list.slice(0, state.shown);
+  if(!slice.length){ grid.innerHTML='<p class="empty">No places match — try a different search or filter.</p>'; moreBtn.classList.add('hidden'); wireGrid(); return; }
+  var wide = window.innerWidth>760;
+  if(wide){
+    var a='', b='';
+    slice.forEach(function(r,i){ if(i%2===0) a+=cardHTML(r); else b+=cardHTML(r); });
+    grid.innerHTML='<div class="grid-cols"><div class="grid-col">'+a+'</div><div class="grid-col">'+b+'</div></div>';
+  } else {
+    grid.innerHTML=slice.map(cardHTML).join('');
+  }
+  moreBtn.classList.toggle('hidden', state.shown>=list.length);
+  wireGrid();
+}
+function wireGrid(){
+  grid.querySelectorAll('[data-goto]').forEach(function(el){
+    el.addEventListener('click', function(){ goToDetail(el.getAttribute('data-goto')); });
+    if(el.classList.contains('card-title-link')){
+      el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goToDetail(el.getAttribute('data-goto')); } });
+    }
+  });
+  grid.querySelectorAll('[data-copy]').forEach(function(btn){ wireCopy(btn, btn.getAttribute('data-copy')); });
+}
+
+/* ---------- detail rendering ---------- */
+var LIST_TITLE=document.title;
+function fmtDate(iso){
+  var d=new Date(iso+'T12:00:00');
+  return d.toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric'});
+}
+function fmtTime(t){
+  if(!t) return '';
+  var parts=t.split(':'); var hh=+parts[0], mm=parts[1]||'00';
+  var ap=hh>=12?'PM':'AM'; hh=hh%12; if(hh===0) hh=12;
+  return hh+(mm!=='00'?':'+mm:'')+' '+ap;
+}
+function infoRow(label, valueHTML){ return '<div class="info-row"><span class="info-label">'+label+'</span><span class="info-value">'+valueHTML+'</span></div>'; }
+var BURGER_GUIDE = {"ikedas": "ikeda-s-california-country-market", "friar-tucks": "friar-tuck-s-now-the-sherwood", "wise-villa-winery": "wise-villa-winery-and-restaurant", "old-town-grill": "old-town-grill", "shoestring": "shoestring", "88-giant-burgers-to-go": "88-giant-burgers-to-go", "kennedys-pioneer-burger": "kennedy-s-pioneer-burger", "mel-and-fayes-diner": "mel-and-faye-s-diner", "sizemores-country-store": "sizemore-country-store", "cavanas-pub-and-grub": "cavana-s-pub-and-grub", "marlene-and-glens-diner": "marlene-and-glen-s-diner-the-dead-fly-diner", "helwig-winery": "the-kitchen-at-helwig-winery", "villa-toscano-winery-bistro": "villa-toscano-winery-the-bistro", "the-end-of-nowhere": "the-end-of-nowhere", "websters-country-burger-drive-in": "webster-s-country-burger-drive-in", "frosty": "frosty-angels-camp", "ironstone-vineyards": "gold-leaf-bistro-ironstone-vineyards", "diamondback-grill": "diamondback-grill", "jamestown-frosty": "jamestown-frosty", "lake-alpine-lodge": "lake-alpine-lodge", "walker-burger": "walker-burger", "bootleggers-old-town-tavern": "bootleggers-old-town-tavern", "south-pine-cafe": "south-pine-cafe", "giant-burger-arnold": "giant-burger-arnold", "rojos-tavern": "rojo-s-tavern", "sno-flake-drive-in": "sno-flake-drive-in", "tahoe-bros-charbroiled-burgers": "tahoe-bros-charbroiled-burgers", "cold-water-brewery-and-grill": "cold-water-brewery-and-grill", "california-burger-company": "california-burger-company", "cutthroat-tavern": "cutthroat-tavern", "buena-vista-store": "buena-vista-store-and-saloon", "acorn-ridge-casino-stonecreek-kitchen": "acorn-ridge-casino-old-roots-bar", "angies-place": "angie-s-place", "patio-drive-in": "patio-drive-in", "crazy-eddies-panini-grill": "crazy-eddie-s-panini-grill", "gooneys-bar-and-grill": "gooney-s-bar-and-grill", "murphys-pourhouse": "murphys-pourhouse","cooks-station":"cook-s-station","hams-station-cafe":"ham-s-station","the-lube-room-saloon":"the-lube-room-saloon","lucky-beaver-bar-and-burger":"lucky-beaver-bar-and-burger","burger-lounge":"burger-lounge","berts-café":"bert-s-caf","flight-deck-grill-and-golf-club":"flight-deck-grill-and-golf-club"};
+var BURGER_BASE = 'https://davedellaquila.github.io/burgers-in-the-gold-country/';
+function renderDetailEvents(slug){
+  var evs=evByLoc[slug]||[];
+  var box=$('detail-events'), listEl=$('detail-events-list');
+  if(!eventsLoaded || !evs.length){ box.hidden=true; return; }
+  box.hidden=false;
+  listEl.innerHTML=evs.map(function(ev){
+    var when=fmtDate(ev.start_date)+(ev.start_time?' · '+fmtTime(ev.start_time)+(ev.end_time?' – '+fmtTime(ev.end_time):''):'');
+    var q=encodeURIComponent(ev.host_org||ev.name);
+    return '<a class="evrow" href="'+EVENTS_URL+'?q='+q+'"><span class="evwhen">'+esc(when)+'</span><span class="evname">'+esc(ev.name)+'</span></a>';
+  }).join('');
+}
+function showDetail(slug){
+  var r=bySlug[slug];
+  if(!r){ if(dataReady) showList(false); return; }
+  currentDetail=slug;
+  listView.style.display='none'; detailView.hidden=false;
+  $('detail-loading').hidden=true; $('detail-body').hidden=false;
+  var fig=$('detail-photofig'), noPh=$('detail-nophoto');
+  if(r.photo_url){
+    fig.hidden=false; noPh.hidden=true;
+    var img=$('detail-img'); img.src=r.photo_url; img.alt='Photo of '+r.name;
+    $('detail-credit').textContent=r.photo_credit||'';
+    $('detail-photo-btn').setAttribute('aria-label','View the photo of '+r.name+' full screen');
+    currentPhoto={src:r.photo_url, name:r.name, credit:r.photo_credit||''};
+  } else { fig.hidden=true; noPh.hidden=false; currentPhoto=null; }
+  var area=[r.city, r.region].filter(Boolean).join(' · ');
+  $('detail-meta').innerHTML='<span>'+esc(CAT_LABEL[r._cat])+'</span>'+(area?'<span>'+esc(area)+'</span>':'');
+  $('detail-title').textContent=r.name;
+  var descEl=$('detail-desc');
+  descEl.textContent=r.short_description||'';
+  descEl.style.display=r.short_description?'':'none';
+  var rowsHtml='';
+  if(r.address) rowsHtml+=infoRow('Address','<a href="'+esc(mapsURL(r))+'" target="_blank" rel="noopener">'+esc(r.address)+'</a><span class="info-sub">Tap to open in Apple Maps</span>');
+  if(r.phone){
+    var digits=r.phone.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
+    rowsHtml+=infoRow('Phone','<a href="tel:+1'+esc(digits)+'" aria-label="Call '+esc(r.phone)+'">'+esc(r.phone)+'</a><span class="info-sub">Tap to call</span>');
+  }
+  if(r.website_url){
+    var label=r.website_url; try{ label=new URL(r.website_url).hostname.replace(/^www\./,''); }catch(e){}
+    var what = r._cat==='marker' ? 'Marker record at HMdb' : 'Visit website';
+    rowsHtml+=infoRow('Website','<a href="'+esc(r.website_url)+'" target="_blank" rel="noopener">'+esc(label)+'</a><span class="info-sub">'+what+'</span>');
+  }
+  rowsHtml+=infoRow('Kind', esc(CAT_LABEL[r._cat])+(area?' · '+esc(area):''));
+  $('detail-info').innerHTML=rowsHtml;
+  var dir=$('detail-dir'); dir.href=mapsURL(r); dir.classList.remove('hidden');
+  var web=$('detail-web');
+  if(r.website_url){ web.href=r.website_url; web.classList.remove('hidden'); } else web.classList.add('hidden');
+  var bg=$('detail-burger');
+  if(BURGER_GUIDE[slug]){ bg.href=BURGER_BASE+'?place='+encodeURIComponent(BURGER_GUIDE[slug])+'#/place/'+encodeURIComponent(BURGER_GUIDE[slug]); bg.classList.remove('hidden'); } else bg.classList.add('hidden');
+  renderDetailEvents(slug);
+  document.title=r.name+' — Places of the Gold Country';
+  window.scrollTo(0,0);
+}
+function showList(restore){
+  var wasDetail=currentDetail;
+  currentDetail=null; currentPhoto=null;
+  detailView.hidden=true; listView.style.display='';
+  document.title=LIST_TITLE;
+  if(!restore) return;
+  if(coldDetail && wasDetail){
+    coldDetail=false;
+    var t=document.getElementById('card-'+wasDetail);
+    if(t){ t.scrollIntoView({block:'center'}); t.classList.add('hash-highlight'); setTimeout(function(){ t.classList.remove('hash-highlight'); }, 2600); return; }
+  }
+  window.scrollTo(0, savedScrollY);
+}
+function goToDetail(slug){
+  if(!bySlug[slug]) return;
+  if(currentDetail!==slug) savedScrollY=window.scrollY||window.pageYOffset||0;
+  sessionNav=true;
+  var target='#/place/'+encodeURIComponent(slug);
+  if(window.location.hash===target){ showDetail(slug); }
+  else { window.location.hash=target; }
+}
+function goBack(){
+  if(sessionNav){ window.history.back(); }
+  else{
+    var clean=window.location.pathname;
+    try{
+      var sp=new URLSearchParams(window.location.search); sp.delete('place');
+      var rest=sp.toString(); if(rest) clean+='?'+rest;
+    }catch(e){}
+    window.history.pushState(null,'',clean);
+    showList(true);
+  }
+}
+$('detail-back').addEventListener('click', goBack);
+$('detail-back-2').addEventListener('click', goBack);
+wireCopy($('detail-copy'), function(){ return currentDetail; });
+
+/* ---------- photo viewer with drag-down to dismiss ---------- */
+var viewer=$('viewer'), vStage=$('viewer-stage'), vImg=$('viewer-img'), vCap=$('viewer-cap');
+function openViewer(){
+  if(!currentPhoto) return;
+  vImg.src=currentPhoto.src; vImg.alt='Photo of '+currentPhoto.name;
+  vCap.textContent=currentPhoto.name+(currentPhoto.credit?' — '+currentPhoto.credit:'');
+  vStage.style.transform=''; viewer.style.background='';
+  viewer.hidden=false;
+  document.body.style.overflow='hidden';
+}
+function closeViewer(){ viewer.hidden=true; document.body.style.overflow=''; }
+$('detail-photo-btn').addEventListener('click', openViewer);
+$('viewer-close').addEventListener('click', closeViewer);
+viewer.addEventListener('click', function(e){ if(e.target===viewer) closeViewer(); });
+(function(){
+  var startY=null, dy=0, dragging=false;
+  viewer.addEventListener('pointerdown', function(e){ startY=e.clientY; dy=0; dragging=true; });
+  viewer.addEventListener('pointermove', function(e){
+    if(!dragging||startY===null) return;
+    dy=e.clientY-startY;
+    if(dy>0){ vStage.style.transform='translateY('+dy+'px)'; viewer.style.background='rgba(12,9,6,'+Math.max(.55, .95 - dy/500)+')'; }
+  });
+  function end(){ if(!dragging) return; dragging=false; if(dy>90){ closeViewer(); } vStage.style.transform=''; viewer.style.background=''; startY=null; dy=0; }
+  viewer.addEventListener('pointerup', end);
+  viewer.addEventListener('pointercancel', end);
+})();
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape') return;
+  if(!viewer.hidden) closeViewer();
+  else if(currentDetail) goBack();
+});
+
+/* ---------- controls ---------- */
+qEl.value=state.q;
+var qTimer=null;
+qEl.addEventListener('input', function(){
+  clearTimeout(qTimer);
+  qTimer=setTimeout(function(){ state.q=qEl.value; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); }, 160);
+});
+moreBtn.addEventListener('click', function(){ state.shown+=PAGE; renderGrid(false); });
+window.addEventListener('resize', (function(){ var t; return function(){ clearTimeout(t); t=setTimeout(function(){ if(dataReady && !currentDetail) renderGrid(false); }, 250); }; })());
+
+/* ---------- boot: route first, then data ---------- */
+var initialRoute=routeSlug();
+if(initialRoute){
+  coldDetail=true;
+  var hasHashRoute=/^#\/place\//.test(window.location.hash||'');
+  var hasQueryRoute=false;
+  try{ hasQueryRoute=!!new URLSearchParams(window.location.search).get('place'); }catch(e){}
+  if(hasQueryRoute && !hasHashRoute){
+    try{ window.history.replaceState(null,'',window.location.pathname+'#/place/'+encodeURIComponent(initialRoute)); }catch(e){}
+  }
+  listView.style.display='none'; detailView.hidden=false; $('detail-loading').hidden=false; $('detail-body').hidden=true;
+}
+window.addEventListener('hashchange', function(){
+  var r=routeSlug();
+  if(r && dataReady && bySlug[r]) showDetail(r);
+  else if(r && !dataReady){ coldDetail=true; listView.style.display='none'; detailView.hidden=false; $('detail-loading').hidden=false; $('detail-body').hidden=true; }
+  else showList(true);
+});
+
+loadLocations().then(function(all){
+  rows=all;
+  rows.forEach(function(r){
+    r._cat=categoryOf(r); bySlug[r.slug]=r;
+    r._nn=normName(r.name);
+    r._hay=normName([r.name,r.city,r.region,r.address,r.short_description].join(' '));
+  });
+  rows.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  dataReady=true;
+  renderPills();
+  renderGrid(true);
+  var r0=routeSlug();
+  if(r0 && bySlug[r0]){ showDetail(r0); }
+  else if(r0){ showList(false); }
+  loadEvents().then(applyEvents).catch(function(){ eventsLoaded=true; });
+}).catch(function(){
+  grid.innerHTML='<p class="empty">Couldn’t reach the locations database just now — please reload to try again.</p>';
+  countEl.textContent='';
+});
+})();
+</script>
+</body>
+</html>
