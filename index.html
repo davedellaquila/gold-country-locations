@@ -52,6 +52,25 @@ h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,6vw,64px);l
 .search-clear.visible{display:inline-flex}
 .search-clear:hover,.search-clear:active{background:var(--line);color:var(--ink);border-color:var(--muted)}
 .search-clear:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hero-summary{margin:12px 0 0}
+.hero-summary .pill{display:inline-block;font-family:Inter,sans-serif;font-size:13.5px;font-weight:700;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 13px;color:var(--ink)}
+.mappref{align-items:center}
+.mappref-label{font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:var(--muted)}
+.visitedbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:10px;background:var(--teal-bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.visitedbar strong{font-family:Inter,sans-serif;font-size:14px;color:var(--teal)}
+.visited-progress-track{flex:1 1 120px;min-width:100px;height:8px;border-radius:999px;background:var(--card);border:1px solid var(--line);overflow:hidden}
+.visited-progress-fill{height:100%;width:0%;background:var(--teal);border-radius:999px;transition:width .25s ease}
+.card.visited{border-color:var(--teal);border-width:2px}
+.visited-stamp{position:absolute;top:10px;right:10px;z-index:3;font-family:Inter,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--teal);color:#fff;padding:6px 9px;border-radius:999px;display:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.card.visited .visited-stamp{display:inline-block}
+.visited-btn{margin-top:10px;width:100%;min-height:44px;border-radius:10px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);font-weight:700;font-size:14px;cursor:pointer;padding:10px 12px;font-family:Inter,sans-serif}
+.visited-btn[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal)}
+.visited-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.card-actions .visited-btn{margin-top:0;flex:1 1 140px;width:auto}
+.detail-actions .visited-btn{margin-top:0;width:auto;flex:1 1 160px}
+.hidevisited{min-height:38px;padding:8px 13px;border-radius:999px;border:1px solid var(--teal);background:transparent;color:var(--teal);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;font-size:13.5px}
+.hidevisited[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal)}
+.copy-btn svg{width:16px;height:16px;flex:0 0 auto}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
 .filters button{min-height:38px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;cursor:pointer;font-size:13.5px}
 .filters button.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -167,11 +186,14 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
     </div>
     <p class="lede">Every place in the database — <strong>historical markers, wineries, diners, distilleries and sights</strong> across the Mother Lode and the Sierra foothills. Every place has its own page; tap a card for the full story, or copy its link to share it.</p>
     <p class="hero-link">Looking for what's going on? <a href="https://events.fiddletowngazette.com/">Browse the Gold Country events calendar →</a></p>
+    <p class="hero-summary"><span class="pill" id="hero-summary">Loading places…</span></p>
   </div>
   <div class="controls">
     <div class="search-wrap"><input class="search" id="q" type="search" placeholder="Search places — try “distillery”, “Volcano”, “burger”…" aria-label="Search places"><button type="button" class="search-clear" id="q-clear" aria-label="Clear search" title="Clear search" hidden>&#10005;</button></div>
     <div class="filters" id="pills" role="group" aria-label="Filter by kind of place"></div>
     <div class="filters towns" id="towns" role="group" aria-label="Filter by town"></div>
+    <div class="filters mappref" role="group" aria-label="Preferred map app"><span class="mappref-label">Maps:</span><button type="button" data-mappref="google">Google Maps</button><button type="button" data-mappref="apple">Apple Maps</button><button type="button" data-mappref="osm">OpenStreetMap</button></div>
+    <div class="visitedbar" id="visitedbar"><strong id="visited-count">Visited 0 of 0</strong><div class="visited-progress-track"><div class="visited-progress-fill" id="visited-fill"></div></div><button type="button" class="hidevisited" id="hide-visited" aria-pressed="false">Hide visited</button></div>
     <div class="count" id="count" aria-live="polite"></div>
   </div>
   <div class="grid" id="grid"><p class="empty" id="loading">Loading places…</p></div>
@@ -195,7 +217,8 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
       <p class="detail-desc" id="detail-desc"></p>
       <div class="detail-info" id="detail-info"></div>
       <div class="detail-actions">
-        <button class="copy-btn" id="detail-copy" type="button">🔗 <span>Copy link</span></button>
+        <button class="copy-btn" id="detail-copy" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg> <span>Share</span></button>
+        <button class="visited-btn" id="detail-visited" type="button" aria-pressed="false">Mark as visited</button>
         <a class="details-btn hidden" id="detail-dir" target="_blank" rel="noopener">Directions →</a>
         <a class="details-btn hidden" id="detail-web" target="_blank" rel="noopener">Visit website →</a>
         <a class="details-btn hidden" id="detail-burger" target="_blank" rel="noopener">🍔 The burger story →</a>
@@ -354,12 +377,25 @@ function inCat(r, cat){
 
 /* ---------- state ---------- */
 var rows = [], bySlug = {}, evByLoc = {}, eventsLoaded = false;
-var state = { q:'', cat:'all', town:'', shown: PAGE };
+var state = { q:'', cat:'all', town:'', shown: PAGE, hideVisited:false };
 try{
   var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-  if(saved){ state.q = saved.q||''; state.cat = saved.cat||'all'; state.town = saved.town||''; }
+  if(saved){ state.q = saved.q||''; state.cat = saved.cat||'all'; state.town = saved.town||''; state.hideVisited = !!saved.hideVisited; }
 }catch(e){}
-function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({q:state.q, cat:state.cat, town:state.town})); }catch(e){} }
+function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({q:state.q, cat:state.cat, town:state.town, hideVisited:state.hideVisited})); }catch(e){} }
+
+/* ---------- visited (Burgers guide pattern, Nov 24, 2026) ---------- */
+var VISITED_KEY='gcloc.visited.v1';
+function loadVisited(){ try{ var v=JSON.parse(localStorage.getItem(VISITED_KEY)||'{}'); return (v && typeof v==='object')? v : {}; }catch(e){ return {}; } }
+var visited=loadVisited();
+function saveVisited(){ try{ localStorage.setItem(VISITED_KEY, JSON.stringify(visited)); }catch(e){} }
+var visitedDirty=false;
+function updateVisitedBar(){
+  var n=0; rows.forEach(function(r){ if(visited[r.slug]) n++; });
+  var vc=$('visited-count'); if(vc) vc.textContent='Visited '+n+' of '+rows.length;
+  var vf=$('visited-fill'); if(vf) vf.style.width=(rows.length? Math.round(n/rows.length*100):0)+'%';
+  var hb=$('hide-visited'); if(hb) hb.setAttribute('aria-pressed', state.hideVisited?'true':'false');
+}
 
 /* ---------- elements ---------- */
 var $ = function(id){ return document.getElementById(id); };
@@ -397,12 +433,21 @@ function wireCopy(btn, getSlug){
     var slug = (typeof getSlug==='function') ? getSlug() : getSlug;
     if(!slug) return;
     var lbl = btn.querySelector('span');
-    copyText(detailURL(slug), function(ok){
+    function copied(ok){
       btn.classList.toggle('copied', ok);
       if(lbl) lbl.textContent = ok ? 'Link copied' : 'Copy failed — try again';
       if(timer) clearTimeout(timer);
-      timer=setTimeout(function(){ btn.classList.remove('copied'); if(lbl) lbl.textContent='Copy link'; }, 2200);
-    });
+      timer=setTimeout(function(){ btn.classList.remove('copied'); if(lbl) lbl.textContent='Share'; }, 2200);
+    }
+    var url=detailURL(slug), rec=bySlug[slug];
+    /* Burgers pattern: the native share sheet where one exists, carrying the
+       place's canonical link; otherwise fall back to copying the link. */
+    if(navigator.share){
+      navigator.share({ title:(rec? rec.name : 'Place')+' — Places of the Gold Country', text:(rec? rec.name : 'A place')+' — from Places of the Gold Country', url:url })
+        .catch(function(err){ if(err && err.name!=='AbortError') copyText(url, copied); });
+    } else {
+      copyText(url, copied);
+    }
   });
 }
 
@@ -467,6 +512,7 @@ function applyEvents(events){
 function filtered(){
   var q=normName(state.q);
   return rows.filter(function(r){
+    if(state.hideVisited && visited[r.slug]) return false;
     if(!inCat(r, state.cat)) return false;
     if(state.town && (r.city||'')!==state.town) return false;
     if(q && r._hay.indexOf(q)===-1) return false;
@@ -476,6 +522,7 @@ function filtered(){
 function facetTowns(){
   var q=normName(state.q), counts={};
   rows.forEach(function(r){
+    if(state.hideVisited && visited[r.slug]) return;
     if(!inCat(r, state.cat)) return;
     if(q && r._hay.indexOf(q)===-1) return;
     if(r.city) counts[r.city]=(counts[r.city]||0)+1;
@@ -483,8 +530,8 @@ function facetTowns(){
   return counts;
 }
 function renderPills(){
-  var counts={all:rows.length, marker:0, winery:0, food:0, sight:0, burger:0, pizza:0, saloon:0, roadhouse:0, chinese:0, asian:0, italian:0, steakhouse:0, other:0};
-  rows.forEach(function(r){ counts[r._cat]++; for(var t in TAGS){ if(TAGS[t][r.slug]) counts[t]++; } for(var f in TAGFNS){ if(TAGFNS[f](r)) counts[f]++; } });
+  var counts={all:0, marker:0, winery:0, food:0, sight:0, burger:0, pizza:0, saloon:0, roadhouse:0, chinese:0, asian:0, italian:0, steakhouse:0, other:0};
+  rows.forEach(function(r){ if(state.hideVisited && visited[r.slug]) return; counts.all++; counts[r._cat]++; for(var t in TAGS){ if(TAGS[t][r.slug]) counts[t]++; } for(var f in TAGFNS){ if(TAGFNS[f](r)) counts[f]++; } });
   var html='';
   CATS.forEach(function(c){
     html+='<button type="button" data-cat="'+c.id+'" class="'+(state.cat===c.id?'active':'')+'" aria-pressed="'+(state.cat===c.id)+'">'+esc(c.label)+' ('+counts[c.id]+')</button>';
@@ -529,14 +576,61 @@ function renderTowns(){
   var tg=townsEl.querySelector('button[data-towns-toggle]');
   if(tg) tg.addEventListener('click', function(){ townsOpen=!townsOpen; renderTowns(); });
 }
+/* Preferred map app — the Burgers guide pattern (Nov 24, 2026): one
+   device-saved choice drives every map link. The storage key is SHARED with
+   the Burgers guide, so a reader's choice carries across all three pages. */
+var MAP_PREF_KEY='burgers-gold-country-maps-v1';
+var MAP_LABELS={google:'Google Maps', apple:'Apple Maps', osm:'OpenStreetMap'};
+function getMapPref(){ try{ var p=localStorage.getItem(MAP_PREF_KEY); return MAP_LABELS[p]? p : 'google'; }catch(e){ return 'google'; } }
 function mapsURL(r){
-  if(r.latitude!=null && r.longitude!=null) return 'https://maps.apple.com/?ll='+r.latitude+','+r.longitude+'&q='+encodeURIComponent(r.name);
-  if(r.address) return 'https://maps.apple.com/?q='+encodeURIComponent(r.address);
-  return 'https://maps.apple.com/?q='+encodeURIComponent(r.name+(r.city?', '+r.city+', CA':''));
+  var pref=getMapPref();
+  var hasLL=(r.latitude!=null && r.longitude!=null);
+  var ll=hasLL? r.latitude+','+r.longitude : null;
+  var q=r.name+(r.city?', '+r.city+', CA':'');
+  var addr=r.address||q;
+  if(pref==='apple'){
+    if(hasLL) return 'https://maps.apple.com/?ll='+ll+'&q='+encodeURIComponent(r.name);
+    return 'https://maps.apple.com/?q='+encodeURIComponent(addr);
+  }
+  if(pref==='osm'){
+    /* OSM's data has almost none of these small rural businesses by name;
+       coordinates land exactly, otherwise search by street address. */
+    if(hasLL) return 'https://www.openstreetmap.org/?mlat='+r.latitude+'&mlon='+r.longitude+'#map=16/'+r.latitude+'/'+r.longitude;
+    return 'https://www.openstreetmap.org/search?query='+encodeURIComponent(addr);
+  }
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(hasLL? ll : addr);
 }
+function renderDetailInfo(r){
+  var rowsHtml='';
+  if(r.address) rowsHtml+=infoRow('Address','<a href="'+esc(mapsURL(r))+'" target="_blank" rel="noopener">'+esc(r.address)+'</a><span class="info-sub">Tap to open in '+MAP_LABELS[getMapPref()]+'</span>');
+  if(r.phone){
+    var digits=r.phone.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
+    rowsHtml+=infoRow('Phone','<a href="tel:+1'+esc(digits)+'" aria-label="Call '+esc(r.phone)+'">'+esc(r.phone)+'</a><span class="info-sub">Tap to call</span>');
+  }
+  if(r.website_url){
+    var label=r.website_url; try{ label=new URL(r.website_url).hostname.replace(/^www\./,''); }catch(e){}
+    var what = r._cat==='marker' ? 'Marker record at HMdb' : 'Visit website';
+    rowsHtml+=infoRow('Website','<a href="'+esc(r.website_url)+'" target="_blank" rel="noopener">'+esc(label)+'</a><span class="info-sub">'+what+'</span>');
+  }
+  var area=[r.city, r.region].filter(Boolean).join(' · ');
+  rowsHtml+=infoRow('Kind', esc(CAT_LABEL[r._cat])+(area?' · '+esc(area):''));
+  $('detail-info').innerHTML=rowsHtml;
+}
+function applyMapPref(){
+  var pref=getMapPref();
+  document.querySelectorAll('[data-mappref]').forEach(function(b){ var on=b.getAttribute('data-mappref')===pref; b.classList.toggle('active', on); b.setAttribute('aria-pressed', on?'true':'false'); });
+  if(currentDetail && bySlug[currentDetail]){
+    var r=bySlug[currentDetail];
+    var dir=$('detail-dir'); if(dir) dir.href=mapsURL(r);
+    renderDetailInfo(r);
+  }
+}
+var SHARE_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>';
 function cardHTML(r){
   var evs=evByLoc[r.slug]||[];
-  var h='<article class="card" id="card-'+esc(r.slug)+'" data-cat="'+r._cat+'">';
+  var isV=!!visited[r.slug];
+  var h='<article class="card'+(isV?' visited':'')+'" id="card-'+esc(r.slug)+'" data-cat="'+r._cat+'">';
+  h+='<span class="visited-stamp">✓ Visited</span>';
   if(r.photo_url){
     h+='<figure class="photofig"><button class="photo-btn" type="button" data-goto="'+esc(r.slug)+'" aria-label="View details for '+esc(r.name)+'"><img class="cardphoto" loading="lazy" src="'+esc(r.photo_url)+'" alt="Photo of '+esc(r.name)+'"></button>';
     if(r.photo_credit) h+='<figcaption class="credit">'+esc(r.photo_credit)+'</figcaption>';
@@ -549,7 +643,7 @@ function cardHTML(r){
   if(area) h+='<p class="area">'+esc(area)+'</p>';
   if(r.address) h+='<p class="addr">'+esc(r.address)+'</p>';
   if(r.short_description) h+='<p class="desc">'+esc(r.short_description)+'</p>';
-  h+='<div class="card-actions"><button class="details-btn" type="button" data-goto="'+esc(r.slug)+'">Details →</button><button class="copy-btn" type="button" data-copy="'+esc(r.slug)+'">🔗 <span>Copy link</span></button></div>';
+  h+='<div class="card-actions"><button class="visited-btn" type="button" data-visited="'+esc(r.slug)+'" aria-pressed="'+(isV?'true':'false')+'">'+(isV?'✓ Visited — tap to undo':'Mark as visited')+'</button><button class="details-btn" type="button" data-goto="'+esc(r.slug)+'">Details →</button><button class="copy-btn" type="button" data-copy="'+esc(r.slug)+'">'+SHARE_ICON+' <span>Share</span></button></div>';
   h+='</div></article>';
   return h;
 }
@@ -588,6 +682,13 @@ function wireGrid(){
     }
   });
   grid.querySelectorAll('[data-copy]').forEach(function(btn){ wireCopy(btn, btn.getAttribute('data-copy')); });
+  grid.querySelectorAll('[data-visited]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var slug=btn.getAttribute('data-visited');
+      if(visited[slug]) delete visited[slug]; else visited[slug]=true;
+      saveVisited(); updateVisitedBar(); renderPills(); renderGrid(false);
+    });
+  });
 }
 
 /* ---------- detail rendering ---------- */
@@ -669,19 +770,9 @@ function showDetail(slug){
   var descEl=$('detail-desc');
   descEl.textContent=r.short_description||'';
   descEl.style.display=r.short_description?'':'none';
-  var rowsHtml='';
-  if(r.address) rowsHtml+=infoRow('Address','<a href="'+esc(mapsURL(r))+'" target="_blank" rel="noopener">'+esc(r.address)+'</a><span class="info-sub">Tap to open in Apple Maps</span>');
-  if(r.phone){
-    var digits=r.phone.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
-    rowsHtml+=infoRow('Phone','<a href="tel:+1'+esc(digits)+'" aria-label="Call '+esc(r.phone)+'">'+esc(r.phone)+'</a><span class="info-sub">Tap to call</span>');
-  }
-  if(r.website_url){
-    var label=r.website_url; try{ label=new URL(r.website_url).hostname.replace(/^www\./,''); }catch(e){}
-    var what = r._cat==='marker' ? 'Marker record at HMdb' : 'Visit website';
-    rowsHtml+=infoRow('Website','<a href="'+esc(r.website_url)+'" target="_blank" rel="noopener">'+esc(label)+'</a><span class="info-sub">'+what+'</span>');
-  }
-  rowsHtml+=infoRow('Kind', esc(CAT_LABEL[r._cat])+(area?' · '+esc(area):''));
-  $('detail-info').innerHTML=rowsHtml;
+  renderDetailInfo(r);
+  var dv=$('detail-visited');
+  if(dv){ var isV=!!visited[slug]; dv.setAttribute('aria-pressed', isV?'true':'false'); dv.textContent= isV? '✓ Visited — tap to undo' : 'Mark as visited'; }
   var dir=$('detail-dir'); dir.href=mapsURL(r); dir.classList.remove('hidden');
   var web=$('detail-web');
   if(r.website_url){ web.href=r.website_url; web.classList.remove('hidden'); } else web.classList.add('hidden');
@@ -696,6 +787,7 @@ function showList(restore){
   currentDetail=null; currentPhoto=null; currentGallery=[]; currentPhotoIdx=0;
   detailView.hidden=true; listView.style.display='';
   document.title=LIST_TITLE;
+  if(visitedDirty){ visitedDirty=false; renderPills(); renderGrid(false); }
   if(!restore) return;
   if(coldDetail && wasDetail){
     coldDetail=false;
@@ -800,6 +892,26 @@ if(qClear){ qClear.addEventListener('click', function(){
   updateQClear(); qEl.focus();
 }); }
 updateQClear();
+document.querySelectorAll('[data-mappref]').forEach(function(b){
+  b.addEventListener('click', function(){
+    try{ localStorage.setItem(MAP_PREF_KEY, b.getAttribute('data-mappref')); }catch(e){}
+    applyMapPref();
+  });
+});
+applyMapPref();
+var hideVisitedBtn=$('hide-visited');
+if(hideVisitedBtn){ hideVisitedBtn.addEventListener('click', function(){
+  state.hideVisited=!state.hideVisited; saveState(); updateVisitedBar(); renderPills(); renderGrid(true); scrollToResults();
+}); }
+var detailVisitedBtn=$('detail-visited');
+if(detailVisitedBtn){ detailVisitedBtn.addEventListener('click', function(){
+  if(!currentDetail) return;
+  if(visited[currentDetail]) delete visited[currentDetail]; else visited[currentDetail]=true;
+  saveVisited(); visitedDirty=true; updateVisitedBar();
+  var isV=!!visited[currentDetail];
+  detailVisitedBtn.setAttribute('aria-pressed', isV?'true':'false');
+  detailVisitedBtn.textContent= isV? '✓ Visited — tap to undo' : 'Mark as visited';
+}); }
 moreBtn.addEventListener('click', function(){ state.shown+=PAGE; renderGrid(false); });
 window.addEventListener('resize', (function(){ var t; return function(){ clearTimeout(t); t=setTimeout(function(){ if(dataReady && !currentDetail) renderGrid(false); }, 250); }; })());
 
@@ -833,6 +945,13 @@ loadLocations().then(function(all){
   });
   rows.sort(function(a,b){ return a.name.localeCompare(b.name); });
   dataReady=true;
+  (function(){
+    var towns={}, counties={};
+    rows.forEach(function(r){ if(r.city) towns[r.city]=1; if(r.region && / County$/.test(r.region)) counties[r.region]=1; });
+    var hs=$('hero-summary');
+    if(hs) hs.textContent=rows.length.toLocaleString()+' places • '+Object.keys(towns).length+' towns • '+Object.keys(counties).length+' counties';
+  })();
+  updateVisitedBar();
   renderPills();
   renderGrid(true);
   var r0=routeSlug();
