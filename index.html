@@ -57,6 +57,7 @@ h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,6vw,64px);l
   border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--bg)}
 .filtersum-n{background:var(--rust);color:#fff;border-radius:999px;padding:0 7px;font-size:12px;line-height:18px}
 .controls.collapsed{position:sticky;top:0}
+.controls.opensticky{position:sticky;top:0;z-index:20}
 .search{width:100%;padding:12px 48px 12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;min-height:44px}
 .search-wrap{position:relative}
 .search-clear{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:32px;height:32px;min-width:32px;min-height:32px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--muted);font-size:15px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
@@ -587,6 +588,7 @@ function renderFilterSummary(){
 function setFiltersCollapsed(on){
   var c = document.getElementById('controls'); if(!c) return;
   c.classList.toggle('collapsed', on);
+  if(on) c.classList.remove('opensticky');
   document.getElementById('filtersum').setAttribute('aria-expanded', String(!on));
   if(on) renderFilterSummary();
 }
@@ -597,16 +599,19 @@ function onFilterScroll(){
     fsTicking = false;
     var c = document.getElementById('controls'); if(!c) return;
     var y = window.scrollY || 0, collapsed = c.classList.contains('collapsed');
-    if(y < 40){ fsManualOpen = false; if(collapsed) setFiltersCollapsed(false); }
+    if(y < 40){ fsManualOpen = false; c.classList.remove('opensticky'); if(collapsed) setFiltersCollapsed(false); }
     else if(!collapsed && !fsManualOpen && y > 160) setFiltersCollapsed(true);
-    else if(!collapsed && fsManualOpen && y > fsExpandY + 160){ fsManualOpen = false; setFiltersCollapsed(true); }
+    else if(!collapsed && fsManualOpen && y > fsExpandY + 240){ fsManualOpen = false; setFiltersCollapsed(true); }
   });
 }
 window.addEventListener('scroll', onFilterScroll, {passive: true});
 document.getElementById('filtersum').addEventListener('click', function(){
   fsManualOpen = true;
-  fsExpandY = window.scrollY || 0;
   setFiltersCollapsed(false);
+  document.getElementById('controls').classList.add('opensticky');
+  /* Baseline AFTER the expansion settles (scroll anchoring adjusts scrollY
+     by roughly the growth when the block expands — see events view note). */
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ fsExpandY = window.scrollY || 0; }); });
 });
 var townsOpen=false;
 var TOWN_CAP=24;
