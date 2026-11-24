@@ -600,9 +600,11 @@ function mapsURL(r){
   }
   return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(hasLL? ll : addr);
 }
+function fmtCoord(v){ return String(Math.round(v*100000)/100000); }
 function renderDetailInfo(r){
   var rowsHtml='';
   if(r.address) rowsHtml+=infoRow('Address','<a href="'+esc(mapsURL(r))+'" target="_blank" rel="noopener">'+esc(r.address)+'</a><span class="info-sub">Tap to open in '+MAP_LABELS[getMapPref()]+'</span>');
+  if(r.latitude!=null && r.longitude!=null) rowsHtml+=infoRow('Coordinates','<a href="'+esc(mapsURL(r))+'" target="_blank" rel="noopener">'+fmtCoord(r.latitude)+', '+fmtCoord(r.longitude)+'</a><span class="info-sub">Tap to view this spot in '+MAP_LABELS[getMapPref()]+'</span>');
   if(r.phone){
     var digits=r.phone.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');
     rowsHtml+=infoRow('Phone','<a href="tel:+1'+esc(digits)+'" aria-label="Call '+esc(r.phone)+'">'+esc(r.phone)+'</a><span class="info-sub">Tap to call</span>');
