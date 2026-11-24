@@ -286,7 +286,7 @@ function isSteakhouse(r){
    as a bare substring it hides inside "Taphouse". */
 var AS_STRONG_RE = /japanese|sushi|ramen|izakaya|teriyaki|hibachi|teppanyaki|thai|vietnamese|\bpho\b|korean|tandoori|chaat|masala|biryani|himalaya|mongolian|asian|nepal/i;
 var AS_WEAK_RE = /indian|desi|lao/i;
-var AS_FOOD_RE = /(japanese|thai|vietnamese|korean|indian|nepalese|nepali|laotian|filipino|sushi|ramen|\bpho\b|mongolian|himalayan)[^.!?]{0,30}(restaurant|cuisine|kitchen|food|dishes|menu|eatery|grill|bar|cafe|café|house|bistro)|(restaurant|cuisine|kitchen|food|dishes|menu|eatery|grill|bar|cafe|café|house|bistro)[^.!?]{0,30}(japanese|thai|vietnamese|korean|indian|nepalese|nepali|laotian|filipino|sushi|ramen|\bpho\b|mongolian|himalayan)/i;
+var AS_FOOD_RE = /(japanese|thai|vietnamese|korean|indian|nepalese|nepali|laotian|filipino|sushi|ramen|\bpho\b|mongolian|himalayan)[^.!?]{0,30}(restaurant|cuisine|kitchen|food|dishes|menu|eatery|grill|bar|cafe|café|house|bistro|pizzeria)|(restaurant|cuisine|kitchen|food|dishes|menu|eatery|grill|bar|cafe|café|house|bistro|pizzeria)[^.!?]{0,30}(japanese|thai|vietnamese|korean|indian|nepalese|nepali|laotian|filipino|sushi|ramen|\bpho\b|mongolian|himalayan)/i;
 function isAsian(r){
   if(r._cat==='marker') return false;
   if(isChinese(r)) return true;
