@@ -403,7 +403,7 @@ function fetchJSON(url){
   });
 }
 function loadLocations(){
-  var fields='id,name,slug,short_description,address,city,region,website_url,phone,latitude,longitude,photo_url,photo_credit';
+  var fields='id,name,slug,short_description,address,city,region,website_url,phone,latitude,longitude,photo_url,photo_credit,category';
   var all=[], off=0;
   function page(){
     return fetchJSON(BASE+'locations?select='+fields+'&status=eq.published&order=name.asc&limit=1000&offset='+off).then(function(chunk){
@@ -804,7 +804,9 @@ window.addEventListener('hashchange', function(){
 loadLocations().then(function(all){
   rows=all;
   rows.forEach(function(r){
-    r._cat=categoryOf(r); bySlug[r.slug]=r;
+    /* The locations.category column (added + backfilled Nov 24, 2026) is authoritative;
+       categoryOf() remains only as the fallback for a row that arrives without one. */
+    r._cat=(r.category==='marker'||r.category==='winery'||r.category==='food'||r.category==='sight') ? r.category : categoryOf(r); bySlug[r.slug]=r;
     r._nn=normName(r.name);
     r._hay=normName([r.name,r.city,r.region,r.address,r.short_description].join(' '));
   });
