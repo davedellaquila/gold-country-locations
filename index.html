@@ -480,7 +480,12 @@ function renderTowns(){
   var counts=facetTowns();
   if(state.town && !counts[state.town]){ state.town=''; saveState(); }
   var names=Object.keys(counts).sort();
-  var many=names.length>TOWN_CAP;
+  /* The cap exists to tame the unfiltered all-places town list (90+ towns).
+     Under a category filter or a search the town list is already the narrowed
+     set the reader is browsing — capping it there hid small towns entirely
+     (Sutter Creek ranked 27th of 28 pizza towns, so its pill vanished behind
+     the expander and Gold Dust Pizza looked missing). Dave, Nov 24, 2026. */
+  var many=names.length>TOWN_CAP && state.cat==='all' && !state.q;
   var shown=names;
   if(many && !townsOpen){
     var byCount=names.slice().sort(function(a,b){ return counts[b]-counts[a] || (a<b?-1:1); });
