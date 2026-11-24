@@ -299,8 +299,13 @@ function isItalian(r){
   if(IT_NAME_RE.test(r.name||'')) return true;
   return IT_FOOD_RE.test(r.short_description||'');
 }
+/* Verified steakhouses whose own material never uses the signal words
+   (snooty-frog: "Home of the Sizzling Filet" — steakhouse sweep, Nov 24, 2026). */
+var STEAK_SLUGS = { 'snooty-frog': 1 };
 function isSteakhouse(r){
   if(r._cat==='marker') return false;
+  if(STEAK_SLUGS[r.slug]) return true;
+  if(/teppanyaki/i.test(r.name||'')) return true;
   var t=(r.name||'')+' '+(r.short_description||'');
   if(/prime rib|chophouse|steak house/i.test(t)) return true;
   if(/steakhouse/i.test(t) && !/steakhouse[^.!?]{0,60}burgers?\b/i.test(t)) return true;
