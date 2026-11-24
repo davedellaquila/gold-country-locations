@@ -231,7 +231,10 @@ function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</
 function normName(s){ return (s||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim(); }
 
 /* ---------- categories (client-side derivation; the live table has no category column) ---------- */
-var WINERY_NAMES = {'lusso della terra':1, 'chateau davell':1, 'home of the zin man':1, 'cantiga wineworks':1};
+var WINERY_NAMES = {'lusso della terra':1, 'chateau davell':1, 'home of the zin man':1, 'cantiga wineworks':1, 'wine tree farm':1, 'wine tree farm — amador city store':1};
+/* Eateries whose names carry no food signal at all (chains and proper names) —
+   classified food by slug so they never land in Sights & viewpoints. */
+var FOOD_SLUGS = {'big-a-root-beer':1, 'covers-apple-ranch':1, 'grounds':1, 'la-hacienda-de-los-velardes':1, 'local-press':1, 'louie-olivers':1, 'mcdonalds':1, 'starbucks':1, 'subway':1, 'plate-88':1, 'seven-sisters':1, 'the-armory':1, 'the-green-room-social-club':1, 'the-kilted-viking':1, 'the-parlor':1, 'the-service-station':1, 'the-standard-pour':1};
 function categoryOf(r){
   var host = '';
   try{ host = r.website_url ? new URL(r.website_url).hostname.replace(/^www\./,'') : ''; }catch(e){}
@@ -239,7 +242,15 @@ function categoryOf(r){
   var n = (r.name||'').toLowerCase();
   if(WINERY_NAMES[n]) return 'winery';
   if(/winery|vineyard|cellars|wines|estate|vino|château/.test(n)) return 'winery';
-  if(/inn|pub|restaurant|cafe|café|grill|bakery|brew|kitchen|tavern|saloon|hotel|motel|lodge|diner|burger|eats|frosty|deli|coffee|distill|bistro|drive-in/.test(n)) return 'food';
+  if(/inn|pub|restaurant|cafe|café|grill|bakery|brew|kitchen|tavern|saloon|hotel|motel|lodge|diner|burger|eats|frosty|deli|coffee|distill|bistro|drive-in|pizza|pizzeria|sushi|ramen|steakhouse|barbecue|bar-b-q|eatery|cantina|taqueria|alehouse|burrito|\btacos?\b|\bnoodles?\b|\blounge\b/.test(n)) return 'food';
+  if(FOOD_SLUGS[r.slug]) return 'food';
+  /* Food signals beat the sight fallback (Dave, Nov 24, 2026): a place in a
+     food tag set or matching a cuisine classifier is food even when its name
+     carries no food keyword — Teresa's Place, Angie's Place, and most of the
+     Chinese and Asian sweeps were landing in Sights & viewpoints. 'sight'
+     is only for genuine sights and viewpoints. */
+  for(var t in TAGS){ if(TAGS[t][r.slug]) return 'food'; }
+  if(isChinese(r) || isAsian(r) || isItalian(r) || isSteakhouse(r)) return 'food';
   return 'sight';
 }
 var CATS = [
