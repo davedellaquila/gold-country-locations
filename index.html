@@ -104,6 +104,20 @@ footer{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);margin-t
 .viewer-close:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .viewer-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;will-change:transform;max-width:100%}
 .viewer-hint{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:rgba(245,234,216,.6);font-family:Inter,sans-serif;font-size:12.5px;margin:0;pointer-events:none}
+.viewer-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff;font-size:26px;line-height:1;cursor:pointer;z-index:2}
+.viewer-nav.prev{left:12px}
+.viewer-nav.next{right:12px}
+.viewer-nav:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.viewer-count{position:absolute;top:22px;left:18px;color:#f5ead8;font-family:Inter,sans-serif;font-size:13.5px;font-weight:700;z-index:2}
+.viewer-kind{color:#e8b64c;font-weight:700}
+/* ---------- detail gallery strip ---------- */
+.gal-strip{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding:2px}
+.gal-thumb{position:relative;flex:none;width:84px;height:60px;padding:0;border:2px solid transparent;border-radius:10px;background:var(--chip);cursor:pointer;overflow:hidden}
+.gal-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-thumb.active{border-color:var(--gold)}
+.gal-thumb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.gal-ai{position:absolute;left:4px;bottom:4px;background:rgba(20,14,8,.82);color:#f5ead8;font-family:Inter,sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;padding:2px 6px;border-radius:999px}
+.kind-label{font-family:Inter,sans-serif;font-size:12px;font-weight:700;color:var(--rust);letter-spacing:.03em}
 /* ---------- detail view ---------- */
 #detail-view .detail-wrap{max-width:860px;margin:0 auto;padding:20px 18px 56px}
 .back-btn{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow)}
@@ -168,6 +182,7 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
       <figure class="detail-photofig" id="detail-photofig">
         <button class="detail-photo-btn" id="detail-photo-btn" type="button"><img id="detail-img" alt=""></button>
         <figcaption class="credit" id="detail-credit"></figcaption>
+        <div class="gal-strip" id="detail-strip" hidden role="group" aria-label="More photos of this place"></div>
       </figure>
       <p class="detail-nophoto" id="detail-nophoto" hidden>No photo on file for this place yet.</p>
       <div class="detail-meta meta" id="detail-meta"></div>
@@ -191,6 +206,9 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
 
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
   <button class="viewer-close" id="viewer-close" type="button" aria-label="Close photo viewer">✕</button>
+  <span class="viewer-count" id="viewer-count"></span>
+  <button class="viewer-nav prev" id="viewer-prev" type="button" aria-label="Previous photo">‹</button>
+  <button class="viewer-nav next" id="viewer-next" type="button" aria-label="Next photo">›</button>
   <div class="viewer-stage" id="viewer-stage">
     <img id="viewer-img" alt="">
     <p class="viewer-cap" id="viewer-cap"></p>
@@ -385,6 +403,25 @@ function loadLocations(){
   }
   return page();
 }
+/* Gallery extras live in locations.photos (JSONB, added Nov 24, 2026). Fetched
+   separately so the page works unchanged before the column exists — a failed
+   fetch here simply means no galleries yet. */
+function loadGalleryExtras(){
+  var all=[], off=0;
+  function page(){
+    return fetchJSON(BASE+'locations?select=id,photos&status=eq.published&limit=1000&offset='+off).then(function(chunk){
+      all=all.concat(chunk);
+      if(chunk.length===1000){ off+=1000; return page(); }
+      return all;
+    });
+  }
+  return page().then(function(list){
+    var byId={};
+    rows.forEach(function(r){ byId[r.id]=r; });
+    list.forEach(function(x){ var r=byId[x.id]; if(r && Array.isArray(x.photos)) r.photos=x.photos; });
+    if(currentDetail && bySlug[currentDetail]) showDetail(currentDetail);
+  });
+}
 function loadEvents(){
   var fields='id,name,slug,host_org,location,start_date,start_time,end_time';
   var today=new Date(); var iso=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
@@ -553,6 +590,41 @@ function renderDetailEvents(slug){
     return '<a class="evrow" href="'+EVENTS_URL+'?q='+q+'"><span class="evwhen">'+esc(when)+'</span><span class="evname">'+esc(ev.name)+'</span></a>';
   }).join('');
 }
+/* ---------- photo galleries: cover photo + locations.photos extras ----------
+   Each photo carries its own credit and an honesty kind. The cover's kind is
+   inferred from its credit text (the AI register labels illustrations);
+   extras carry kind explicitly in the JSONB array. */
+function photoKind(credit){ return /ai-created|illustration/i.test(credit||'') ? 'illustration' : 'photo'; }
+function galleryOf(r){
+  var g=[];
+  if(r.photo_url) g.push({url:r.photo_url, credit:r.photo_credit||'', kind:photoKind(r.photo_credit)});
+  var extra=Array.isArray(r.photos) ? r.photos : [];
+  extra.forEach(function(p){
+    if(!p || !p.url || p.url===r.photo_url) return;
+    g.push({url:p.url, credit:p.credit||'', kind:(p.kind==='illustration' ? 'illustration' : 'photo')});
+  });
+  return g;
+}
+var currentGallery=[], currentPhotoIdx=0;
+function setDetailPhoto(idx){
+  if(!currentGallery.length) return;
+  currentPhotoIdx=Math.max(0, Math.min(idx, currentGallery.length-1));
+  var p=currentGallery[currentPhotoIdx], r=bySlug[currentDetail];
+  var img=$('detail-img'); img.src=p.url; img.alt='Photo of '+(r ? r.name : '');
+  $('detail-credit').innerHTML=esc(p.credit)+(p.kind==='illustration' ? ' · <span class="kind-label">AI illustration — not a photo</span>' : '');
+  $('detail-photo-btn').setAttribute('aria-label','View photo '+(currentPhotoIdx+1)+' of '+currentGallery.length+' full screen');
+  currentPhoto={src:p.url, name:r ? r.name : '', credit:p.credit, kind:p.kind};
+  var strip=$('detail-strip');
+  if(currentGallery.length>1){
+    strip.hidden=false;
+    strip.innerHTML=currentGallery.map(function(g,i){
+      return '<button type="button" class="gal-thumb'+(i===currentPhotoIdx ? ' active' : '')+'" data-idx="'+i+'" aria-label="Show photo '+(i+1)+' of '+currentGallery.length+'"><img loading="lazy" src="'+esc(g.url)+'" alt="">'+(g.kind==='illustration' ? '<span class="gal-ai">AI</span>' : '')+'</button>';
+    }).join('');
+    Array.prototype.forEach.call(strip.querySelectorAll('.gal-thumb'), function(b){
+      b.addEventListener('click', function(){ setDetailPhoto(parseInt(b.getAttribute('data-idx'), 10)); });
+    });
+  } else strip.hidden=true;
+}
 function showDetail(slug){
   var r=bySlug[slug];
   if(!r){ if(dataReady) showList(false); return; }
@@ -560,13 +632,11 @@ function showDetail(slug){
   listView.style.display='none'; detailView.hidden=false;
   $('detail-loading').hidden=true; $('detail-body').hidden=false;
   var fig=$('detail-photofig'), noPh=$('detail-nophoto');
-  if(r.photo_url){
+  currentGallery=galleryOf(r); currentPhotoIdx=0;
+  if(currentGallery.length){
     fig.hidden=false; noPh.hidden=true;
-    var img=$('detail-img'); img.src=r.photo_url; img.alt='Photo of '+r.name;
-    $('detail-credit').textContent=r.photo_credit||'';
-    $('detail-photo-btn').setAttribute('aria-label','View the photo of '+r.name+' full screen');
-    currentPhoto={src:r.photo_url, name:r.name, credit:r.photo_credit||''};
-  } else { fig.hidden=true; noPh.hidden=false; currentPhoto=null; }
+    setDetailPhoto(0);
+  } else { fig.hidden=true; noPh.hidden=false; currentPhoto=null; $('detail-strip').hidden=true; }
   var area=[r.city, r.region].filter(Boolean).join(' · ');
   $('detail-meta').innerHTML='<span>'+esc(CAT_LABEL[r._cat])+'</span>'+(area?'<span>'+esc(area)+'</span>':'');
   $('detail-title').textContent=r.name;
@@ -597,7 +667,7 @@ function showDetail(slug){
 }
 function showList(restore){
   var wasDetail=currentDetail;
-  currentDetail=null; currentPhoto=null;
+  currentDetail=null; currentPhoto=null; currentGallery=[]; currentPhotoIdx=0;
   detailView.hidden=true; listView.style.display='';
   document.title=LIST_TITLE;
   if(!restore) return;
@@ -632,33 +702,55 @@ $('detail-back').addEventListener('click', goBack);
 $('detail-back-2').addEventListener('click', goBack);
 wireCopy($('detail-copy'), function(){ return currentDetail; });
 
-/* ---------- photo viewer with drag-down to dismiss ---------- */
+/* ---------- photo viewer: full-screen lightbox, drag-down to dismiss,
+   prev/next + position count when the place has a gallery ---------- */
 var viewer=$('viewer'), vStage=$('viewer-stage'), vImg=$('viewer-img'), vCap=$('viewer-cap');
+function viewerShow(idx){
+  if(!currentGallery.length) return;
+  currentPhotoIdx=((idx%currentGallery.length)+currentGallery.length)%currentGallery.length;
+  var p=currentGallery[currentPhotoIdx], r=bySlug[currentDetail];
+  vImg.src=p.url; vImg.alt='Photo of '+(r ? r.name : '');
+  vCap.innerHTML=esc(r ? r.name : '')+(p.credit ? ' — '+esc(p.credit) : '')+(p.kind==='illustration' ? ' · <span class="viewer-kind">AI illustration — not a photo</span>' : '');
+  $('viewer-count').textContent=currentGallery.length>1 ? (currentPhotoIdx+1)+' / '+currentGallery.length : '';
+  $('viewer-prev').style.display=currentGallery.length>1 ? '' : 'none';
+  $('viewer-next').style.display=currentGallery.length>1 ? '' : 'none';
+  setDetailPhoto(currentPhotoIdx);
+}
 function openViewer(){
   if(!currentPhoto) return;
-  vImg.src=currentPhoto.src; vImg.alt='Photo of '+currentPhoto.name;
-  vCap.textContent=currentPhoto.name+(currentPhoto.credit?' — '+currentPhoto.credit:'');
   vStage.style.transform=''; viewer.style.background='';
   viewer.hidden=false;
   document.body.style.overflow='hidden';
+  viewerShow(currentPhotoIdx);
 }
 function closeViewer(){ viewer.hidden=true; document.body.style.overflow=''; }
 $('detail-photo-btn').addEventListener('click', openViewer);
 $('viewer-close').addEventListener('click', closeViewer);
+$('viewer-prev').addEventListener('click', function(){ viewerShow(currentPhotoIdx-1); });
+$('viewer-next').addEventListener('click', function(){ viewerShow(currentPhotoIdx+1); });
 viewer.addEventListener('click', function(e){ if(e.target===viewer) closeViewer(); });
 (function(){
-  var startY=null, dy=0, dragging=false;
-  viewer.addEventListener('pointerdown', function(e){ startY=e.clientY; dy=0; dragging=true; });
+  var startY=null, startX=null, dy=0, dx=0, dragging=false;
+  viewer.addEventListener('pointerdown', function(e){ startY=e.clientY; startX=e.clientX; dy=0; dx=0; dragging=true; });
   viewer.addEventListener('pointermove', function(e){
     if(!dragging||startY===null) return;
-    dy=e.clientY-startY;
-    if(dy>0){ vStage.style.transform='translateY('+dy+'px)'; viewer.style.background='rgba(12,9,6,'+Math.max(.55, .95 - dy/500)+')'; }
+    dy=e.clientY-startY; dx=e.clientX-startX;
+    if(dy>0 && Math.abs(dy)>=Math.abs(dx)){ vStage.style.transform='translateY('+dy+'px)'; viewer.style.background='rgba(12,9,6,'+Math.max(.55, .95 - dy/500)+')'; }
   });
-  function end(){ if(!dragging) return; dragging=false; if(dy>90){ closeViewer(); } vStage.style.transform=''; viewer.style.background=''; startY=null; dy=0; }
+  function end(){
+    if(!dragging) return; dragging=false;
+    if(Math.abs(dx)>42 && Math.abs(dx)>Math.abs(dy) && currentGallery.length>1){ viewerShow(currentPhotoIdx+(dx<0 ? 1 : -1)); }
+    else if(dy>90){ closeViewer(); }
+    vStage.style.transform=''; viewer.style.background=''; startY=null; startX=null; dy=0; dx=0;
+  }
   viewer.addEventListener('pointerup', end);
   viewer.addEventListener('pointercancel', end);
 })();
 document.addEventListener('keydown', function(e){
+  if(!viewer.hidden && currentGallery.length>1){
+    if(e.key==='ArrowRight'){ viewerShow(currentPhotoIdx+1); return; }
+    if(e.key==='ArrowLeft'){ viewerShow(currentPhotoIdx-1); return; }
+  }
   if(e.key!=='Escape') return;
   if(!viewer.hidden) closeViewer();
   else if(currentDetail) goBack();
@@ -708,6 +800,7 @@ loadLocations().then(function(all){
   if(r0 && bySlug[r0]){ showDetail(r0); }
   else if(r0){ showList(false); }
   loadEvents().then(applyEvents).catch(function(){ eventsLoaded=true; });
+  loadGalleryExtras().catch(function(){});
 }).catch(function(){
   grid.innerHTML='<p class="empty">Couldn’t reach the locations database just now — please reload to try again.</p>';
   countEl.textContent='';
