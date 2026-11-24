@@ -564,7 +564,7 @@ function renderPills(){
    Scrolling down collapses the controls to a single summary row that still
    shows what's active; tapping it expands the full filters in place;
    scrolling back to the top restores them. State is never touched. */
-var fsManualOpen = false, fsExpandY = 0, fsTicking = false;
+var fsManualOpen = false, fsExpandY = 0, fsExpandAt = 0, fsTicking = false;
 function catLabel(){ for(var i=0;i<CATS.length;i++) if(CATS[i].id===state.cat) return CATS[i].label; return 'All places'; }
 function activeFilterCount(){
   var n = 0;
@@ -601,12 +601,17 @@ function onFilterScroll(){
     var y = window.scrollY || 0, collapsed = c.classList.contains('collapsed');
     if(y < 40){ fsManualOpen = false; c.classList.remove('opensticky'); if(collapsed) setFiltersCollapsed(false); }
     else if(!collapsed && !fsManualOpen && y > 160) setFiltersCollapsed(true);
-    else if(!collapsed && fsManualOpen && y > fsExpandY + 240){ fsManualOpen = false; setFiltersCollapsed(true); }
+    else if(!collapsed && fsManualOpen){
+      if(Date.now() - fsExpandAt < 900) fsExpandY = y; /* expansion still settling (anchoring) — track the baseline, never re-collapse yet */
+      else if(y > fsExpandY + 240){ fsManualOpen = false; setFiltersCollapsed(true); }
+    }
   });
 }
 window.addEventListener('scroll', onFilterScroll, {passive: true});
 document.getElementById('filtersum').addEventListener('click', function(){
   fsManualOpen = true;
+  fsExpandAt = Date.now();
+  fsExpandY = window.scrollY || 0;
   setFiltersCollapsed(false);
   document.getElementById('controls').classList.add('opensticky');
   /* Baseline AFTER the expansion settles (scroll anchoring adjusts scrollY
