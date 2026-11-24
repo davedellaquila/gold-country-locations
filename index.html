@@ -46,6 +46,17 @@ h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,6vw,64px);l
 .hero-link{font-family:Inter,sans-serif;font-size:14.5px;margin:10px 0 0}
 .controls{position:sticky;top:0;z-index:20;background:var(--bg);padding:14px 0 10px;border-bottom:1px solid var(--line)}
 @media (max-width:640px){ .controls{position:static} }
+/* Filter collapse (Dave, Nov 24 2026): scrolling collapses the controls to one summary row */
+.filtersum{display:none;width:100%;align-items:center;gap:10px;background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:9px 8px 9px 16px;font-size:14px;
+  color:var(--ink);cursor:pointer;text-align:left;min-height:44px;font-family:Inter,system-ui,sans-serif}
+.controls.collapsed .filtersum{display:flex}
+.controls.collapsed>*:not(.filtersum){display:none!important}
+.filtersum-text{flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.filtersum-cta{flex:none;display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--rust);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--bg)}
+.filtersum-n{background:var(--rust);color:#fff;border-radius:999px;padding:0 7px;font-size:12px;line-height:18px}
+.controls.collapsed{position:sticky;top:0}
 .search{width:100%;padding:12px 48px 12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;min-height:44px}
 .search-wrap{position:relative}
 .search-clear{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:32px;height:32px;min-width:32px;min-height:32px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--muted);font-size:15px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
@@ -188,7 +199,11 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
     <p class="hero-link">Looking for what's going on? <a href="https://events.fiddletowngazette.com/">Browse the Gold Country events calendar →</a></p>
     <p class="hero-summary"><span class="pill" id="hero-summary">Loading places…</span></p>
   </div>
-  <div class="controls">
+  <div class="controls" id="controls">
+    <button type="button" class="filtersum" id="filtersum" aria-expanded="true" aria-label="Show all filters">
+      <span class="filtersum-text" id="filtersum-text">All places</span>
+      <span class="filtersum-cta">Filters <span class="filtersum-n" id="filtersum-n" hidden>0</span> <span aria-hidden="true">&#9662;</span></span>
+    </button>
     <div class="search-wrap"><input class="search" id="q" type="search" placeholder="Search places — try “distillery”, “Volcano”, “burger”…" aria-label="Search places"><button type="button" class="search-clear" id="q-clear" aria-label="Clear search" title="Clear search" hidden>&#10005;</button></div>
     <div class="filters" id="pills" role="group" aria-label="Filter by kind of place"></div>
     <div class="filters towns" id="towns" role="group" aria-label="Filter by town"></div>
@@ -541,7 +556,58 @@ function renderPills(){
     b.addEventListener('click', function(){ state.cat=b.getAttribute('data-cat'); state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); });
   });
   renderTowns();
+  renderFilterSummary();
 }
+
+/* ---------- Filter collapse on scroll (Dave, Nov 24 2026) ----------
+   Scrolling down collapses the controls to a single summary row that still
+   shows what's active; tapping it expands the full filters in place;
+   scrolling back to the top restores them. State is never touched. */
+var fsManualOpen = false, fsExpandY = 0, fsTicking = false;
+function catLabel(){ for(var i=0;i<CATS.length;i++) if(CATS[i].id===state.cat) return CATS[i].label; return 'All places'; }
+function activeFilterCount(){
+  var n = 0;
+  if(state.cat !== 'all') n++;
+  if(state.town) n++;
+  if(state.q) n++;
+  if(state.hideVisited) n++;
+  return n;
+}
+function renderFilterSummary(){
+  var t = document.getElementById('filtersum-text'), badge = document.getElementById('filtersum-n');
+  if(!t) return;
+  var parts = [catLabel()];
+  if(state.town) parts.push(state.town);
+  if(state.q) parts.push('\u201C' + state.q + '\u201D');
+  if(state.hideVisited) parts.push('Visited hidden');
+  t.textContent = parts.join(' \u00B7 ');
+  var n = activeFilterCount();
+  if(badge){ badge.hidden = n === 0; badge.textContent = n; }
+}
+function setFiltersCollapsed(on){
+  var c = document.getElementById('controls'); if(!c) return;
+  c.classList.toggle('collapsed', on);
+  document.getElementById('filtersum').setAttribute('aria-expanded', String(!on));
+  if(on) renderFilterSummary();
+}
+function onFilterScroll(){
+  if(fsTicking) return;
+  fsTicking = true;
+  requestAnimationFrame(function(){
+    fsTicking = false;
+    var c = document.getElementById('controls'); if(!c) return;
+    var y = window.scrollY || 0, collapsed = c.classList.contains('collapsed');
+    if(y < 40){ fsManualOpen = false; if(collapsed) setFiltersCollapsed(false); }
+    else if(!collapsed && !fsManualOpen && y > 160) setFiltersCollapsed(true);
+    else if(!collapsed && fsManualOpen && y > fsExpandY + 160){ fsManualOpen = false; setFiltersCollapsed(true); }
+  });
+}
+window.addEventListener('scroll', onFilterScroll, {passive: true});
+document.getElementById('filtersum').addEventListener('click', function(){
+  fsManualOpen = true;
+  fsExpandY = window.scrollY || 0;
+  setFiltersCollapsed(false);
+});
 var townsOpen=false;
 var TOWN_CAP=24;
 var NEARBY_N=5;
