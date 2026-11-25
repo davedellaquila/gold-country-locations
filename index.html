@@ -92,7 +92,6 @@ h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(38px,6vw,64px);l
 .hidevisited[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal)}
 .copy-btn svg{width:16px;height:16px;flex:0 0 auto}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
-.filters.regions[hidden]{display:none}
 .filters button{min-height:38px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600;cursor:pointer;font-size:13.5px}
 .filters button.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .filters button:focus-visible,.search:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
@@ -216,7 +215,6 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
     </button>
     <div class="search-wrap"><input class="search" id="q" type="search" placeholder="Search places — try “distillery”, “Volcano”, “burger”…" aria-label="Search places"><button type="button" class="search-clear" id="q-clear" aria-label="Clear search" title="Clear search" hidden>&#10005;</button></div>
     <div class="filters" id="pills" role="group" aria-label="Filter by kind of place"></div>
-    <div class="filters regions" id="regions" role="group" aria-label="Filter wineries by region" hidden></div>
     <div class="filters towns" id="towns" role="group" aria-label="Filter by town"></div>
     <div class="filters mappref" role="group" aria-label="Preferred map app"><span class="mappref-label">Maps:</span><button type="button" data-mappref="google">Google Maps</button><button type="button" data-mappref="apple">Apple Maps</button><button type="button" data-mappref="osm">OpenStreetMap</button></div>
     <div class="visitedbar" id="visitedbar"><strong id="visited-count">Visited 0 of 0</strong><div class="visited-progress-track"><div class="visited-progress-fill" id="visited-fill"></div></div><button type="button" class="hidevisited" id="hide-visited" aria-pressed="false">Hide visited</button></div>
@@ -399,25 +397,21 @@ function inCat(r, cat){
   if(TAGFNS[cat]) return TAGFNS[cat](r);
   return r._cat===cat;
 }
-/* Winery regions (Dave, Nov 25, 2026): with the Santa Cruz Mountains sweep
-   the Wineries list spans two distinct regions. A winery's region derives
-   from its county — the three Santa Cruz Mountains counties (Santa Clara,
-   Santa Cruz, San Mateo) vs the Gold Country foothills (everything else).
-   The region filter only exists while the Wineries category is active. */
-var SCM_COUNTIES = {'Santa Clara County':1, 'Santa Cruz County':1, 'San Mateo County':1};
-var REGION_LABELS = { gc:'Gold Country', scm:'Santa Cruz Mountains' };
-function wineryRegion(r){ return SCM_COUNTIES[r.region] ? 'scm' : 'gc'; }
-function regionApplies(){ return state.cat==='winery' && !!state.region; }
+/* Winery region filter — RETIRED Nov 25, 2026 (Dave's scoping ruling).
+   It existed for the hours when one page spanned two territories; with
+   Santa Cruz & South Bay Places live and each front end scoped to its own
+   territory (see the filter at data load), there is one region here and
+   nothing left to filter. */
 
 
 /* ---------- state ---------- */
 var rows = [], bySlug = {}, evByLoc = {}, eventsLoaded = false;
-var state = { q:'', cat:'all', town:'', region:'', shown: PAGE, hideVisited:false };
+var state = { q:'', cat:'all', town:'', shown: PAGE, hideVisited:false };
 try{
   var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-  if(saved){ state.q = saved.q||''; state.cat = saved.cat||'all'; state.town = saved.town||''; state.region = saved.region||''; state.hideVisited = !!saved.hideVisited; }
+  if(saved){ state.q = saved.q||''; state.cat = saved.cat||'all'; state.town = saved.town||''; state.hideVisited = !!saved.hideVisited; }
 }catch(e){}
-function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({q:state.q, cat:state.cat, town:state.town, region:state.region, hideVisited:state.hideVisited})); }catch(e){} }
+function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({q:state.q, cat:state.cat, town:state.town, hideVisited:state.hideVisited})); }catch(e){} }
 
 /* ---------- visited (Burgers guide pattern, Nov 24, 2026) ---------- */
 var VISITED_KEY='gcloc.visited.v1';
@@ -435,7 +429,7 @@ function updateVisitedBar(){
 /* ---------- elements ---------- */
 var $ = function(id){ return document.getElementById(id); };
 var listView=$('list-view'), detailView=$('detail-view'), grid=$('grid'), countEl=$('count'),
-    pillsEl=$('pills'), regionsEl=$('regions'), townsEl=$('towns'), qEl=$('q'), moreBtn=$('more');
+    pillsEl=$('pills'), townsEl=$('towns'), qEl=$('q'), moreBtn=$('more');
 
 /* ---------- routing (burger-guide pattern: dual route ?place=<slug> + #/place/<slug>) ---------- */
 function routeSlug(){
@@ -570,7 +564,6 @@ function filtered(){
   return rows.filter(function(r){
     if(state.hideVisited && visited[r.slug]) return false;
     if(!inCat(r, state.cat)) return false;
-    if(regionApplies() && wineryRegion(r)!==state.region) return false;
     if(state.town && (r.city||'')!==state.town) return false;
     if(q && r._hay.indexOf(q)===-1) return false;
     return true;
@@ -581,7 +574,6 @@ function facetTowns(){
   rows.forEach(function(r){
     if(state.hideVisited && visited[r.slug]) return;
     if(!inCat(r, state.cat)) return;
-    if(regionApplies() && wineryRegion(r)!==state.region) return;
     if(q && r._hay.indexOf(q)===-1) return;
     if(r.city) counts[r.city]=(counts[r.city]||0)+1;
   });
@@ -598,41 +590,9 @@ function renderPills(){
   pillsEl.querySelectorAll('button[data-cat]').forEach(function(b){
     b.addEventListener('click', function(){ var v=b.getAttribute('data-cat'); state.cat=(state.cat===v && v!=='all') ? 'all' : v; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); });
   });
-  renderRegions();
   renderTowns();
   renderFilterSummary();
 }
-/* Region pill row — visible only while the Wineries category is active.
-   Counts follow the page's facet pattern (rows passing the other filters,
-   this facet ignoring its own selection and the town facet). Re-tapping the
-   selected region returns to All regions (the pill toggle standard). If the
-   selected region has no wineries left under the current search, the
-   selection heals back to All regions rather than stranding an empty list. */
-function regionCounts(){
-  var q=normName(state.q), counts={gc:0, scm:0};
-  rows.forEach(function(r){
-    if(state.hideVisited && visited[r.slug]) return;
-    if(!inCat(r, 'winery')) return;
-    if(q && r._hay.indexOf(q)===-1) return;
-    counts[wineryRegion(r)]++;
-  });
-  return counts;
-}
-function renderRegions(){
-  if(state.cat!=='winery'){ regionsEl.hidden=true; regionsEl.innerHTML=''; return; }
-  var counts=regionCounts();
-  if(state.region && !counts[state.region]){ state.region=''; saveState(); }
-  regionsEl.hidden=false;
-  var html='<button type="button" data-region="" class="'+(state.region===''?'active':'')+'" aria-pressed="'+(state.region==='')+'">All regions</button>';
-  ['gc','scm'].forEach(function(k){
-    html+='<button type="button" data-region="'+k+'" class="'+(state.region===k?'active':'')+'" aria-pressed="'+(state.region===k)+'">'+REGION_LABELS[k]+' ('+counts[k]+')</button>';
-  });
-  regionsEl.innerHTML=html;
-  regionsEl.querySelectorAll('button[data-region]').forEach(function(b){
-    b.addEventListener('click', function(){ var v=b.getAttribute('data-region'); state.region=(state.region===v && v!=='') ? '' : v; state.shown=PAGE; saveState(); renderRegions(); renderTowns(); renderGrid(true); scrollToResults(); });
-  });
-}
-
 /* ---------- Filter collapse on scroll (Dave, Nov 24 2026) ----------
    Scrolling down collapses the controls to a single summary row that still
    shows what's active; tapping it expands the full filters in place;
@@ -642,7 +602,6 @@ function catLabel(){ for(var i=0;i<CATS.length;i++) if(CATS[i].id===state.cat) r
 function activeFilterCount(){
   var n = 0;
   if(state.cat !== 'all') n++;
-  if(regionApplies()) n++;
   if(state.town) n++;
   if(state.q) n++;
   if(state.hideVisited) n++;
@@ -652,7 +611,6 @@ function renderFilterSummary(){
   var t = document.getElementById('filtersum-text'), badge = document.getElementById('filtersum-n');
   if(!t) return;
   var parts = [catLabel()];
-  if(regionApplies()) parts.push(REGION_LABELS[state.region]);
   if(state.town) parts.push(state.town);
   if(state.q) parts.push('\u201C' + state.q + '\u201D');
   if(state.hideVisited) parts.push('Visited hidden');
@@ -1179,7 +1137,13 @@ window.addEventListener('hashchange', function(){
 });
 
 loadLocations().then(function(all){
-  rows=all;
+  /* Territory scope (Dave's scoping ruling, Nov 25, 2026): one shared
+     database, separate front ends, each showing only its own territory.
+     The southern counties (Santa Clara, Santa Cruz, San Mateo) surface
+     only on Santa Cruz & South Bay Places (places.lenwoodgazette.com);
+     this Gold Country front end excludes them at load. */
+  var SOUTHERN = {'Santa Clara County':1, 'Santa Cruz County':1, 'San Mateo County':1};
+  rows=all.filter(function(r){ return !SOUTHERN[r.region]; });
   rows.forEach(function(r){
     /* The locations.category column (added + backfilled Nov 24, 2026) is authoritative;
        categoryOf() remains only as the fallback for a row that arrives without one. */
