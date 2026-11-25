@@ -562,7 +562,7 @@ function renderPills(){
   });
   pillsEl.innerHTML=html;
   pillsEl.querySelectorAll('button[data-cat]').forEach(function(b){
-    b.addEventListener('click', function(){ state.cat=b.getAttribute('data-cat'); state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); });
+    b.addEventListener('click', function(){ var v=b.getAttribute('data-cat'); state.cat=(state.cat===v && v!=='all') ? 'all' : v; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); });
   });
   renderTowns();
   renderFilterSummary();
@@ -741,7 +741,7 @@ function renderTowns(){
   }
   townsEl.innerHTML=html;
   townsEl.querySelectorAll('button[data-town]').forEach(function(b){
-    b.addEventListener('click', function(){ state.town=b.getAttribute('data-town'); townsOpen=false; state.shown=PAGE; saveState(); renderTowns(); renderGrid(true); scrollToResults(); });
+    b.addEventListener('click', function(){ var v=b.getAttribute('data-town'); state.town=(state.town===v && v!=='') ? '' : v; townsOpen=false; state.shown=PAGE; saveState(); renderTowns(); renderGrid(true); scrollToResults(); });
   });
   var tg=townsEl.querySelector('button[data-towns-toggle]');
   if(tg) tg.addEventListener('click', function(){ townsOpen=!townsOpen; renderTowns(); });
