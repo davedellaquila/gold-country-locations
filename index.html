@@ -353,7 +353,7 @@ function isItalian(r){
 }
 /* Verified steakhouses whose own material never uses the signal words
    (snooty-frog: "Home of the Sizzling Filet" — steakhouse sweep, Nov 24, 2026). */
-var STEAK_SLUGS = { 'snooty-frog': 1 };
+var STEAK_SLUGS = { 'snooty-frog': 1, 'louie-olivers': 1 };
 function isSteakhouse(r){
   if(r._cat==='marker') return false;
   if(STEAK_SLUGS[r.slug]) return true;
