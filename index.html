@@ -1076,13 +1076,17 @@ function updateQClear(){ if(!qClear) return; var has=!!(qEl.value&&qEl.value.len
 qEl.addEventListener('input', function(){
   updateQClear();
   clearTimeout(qTimer);
-  qTimer=setTimeout(function(){ state.q=qEl.value; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults(); }, 160);
+  /* NO scrollToResults() here (Dave bug report, Nov 24, 2026): scrolling on
+     a keystroke drops the iPad keyboard mid-word — the programmatic scroll
+     also trips the filter collapse, which hides this input and kills focus
+     outright. Typing must never move the page; the list filters in place. */
+  qTimer=setTimeout(function(){ state.q=qEl.value; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); }, 160);
 });
 if(qClear){ qClear.addEventListener('click', function(){
   /* Clear ONLY the text — category/town pills keep their state, exactly as
      if the characters had been deleted by hand (Dave, Nov 24, 2026). */
   qEl.value=''; clearTimeout(qTimer);
-  state.q=''; state.shown=PAGE; saveState(); renderPills(); renderGrid(true); scrollToResults();
+  state.q=''; state.shown=PAGE; saveState(); renderPills(); renderGrid(true);
   updateQClear(); qEl.focus();
 }); }
 updateQClear();
