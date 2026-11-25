@@ -512,6 +512,27 @@ function loadGalleryExtras(){
     if(currentDetail && bySlug[currentDetail]) showDetail(currentDetail);
   });
 }
+/* Two-level descriptions (Dave, Nov 24, 2026): locations.long_description is
+   the detail-card level; short_description stays the card level. Fetched
+   separately like the gallery extras so the page works unchanged before the
+   column exists - a failed fetch simply means every detail falls back to the
+   short description. */
+function loadLongDescriptions(){
+  var all=[], off=0;
+  function page(){
+    return fetchJSON(BASE+'locations?select=id,long_description&status=eq.published&limit=1000&offset='+off).then(function(chunk){
+      all=all.concat(chunk);
+      if(chunk.length===1000){ off+=1000; return page(); }
+      return all;
+    });
+  }
+  return page().then(function(list){
+    var byId={};
+    rows.forEach(function(r){ byId[r.id]=r; });
+    list.forEach(function(x){ var r=byId[x.id]; if(r && x.long_description) r.long_description=x.long_description; });
+    if(currentDetail && bySlug[currentDetail]) showDetail(currentDetail);
+  });
+}
 function loadEvents(){
   var fields='id,name,slug,host_org,location,start_date,start_time,end_time';
   var today=new Date(); var iso=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
@@ -940,8 +961,9 @@ function showDetail(slug){
   $('detail-meta').innerHTML='<span>'+esc(CAT_LABEL[r._cat])+'</span>'+(area?'<span>'+esc(area)+'</span>':'');
   $('detail-title').textContent=r.name;
   var descEl=$('detail-desc');
-  descEl.textContent=r.short_description||'';
-  descEl.style.display=r.short_description?'':'none';
+  var detailDesc=r.long_description||r.short_description||'';
+  descEl.textContent=detailDesc;
+  descEl.style.display=detailDesc?'':'none';
   renderDetailInfo(r);
   var dv=$('detail-visited');
   if(dv){ var isV=!!visited[slug]; dv.setAttribute('aria-pressed', isV?'true':'false'); dv.textContent= isV? '✓ Visited — tap to undo' : 'Mark as visited'; }
@@ -1132,6 +1154,7 @@ loadLocations().then(function(all){
   else if(r0){ showList(false); }
   loadEvents().then(applyEvents).catch(function(){ eventsLoaded=true; });
   loadGalleryExtras().catch(function(){});
+  loadLongDescriptions().catch(function(){});
 }).catch(function(){
   grid.innerHTML='<p class="empty">Couldn’t reach the locations database just now — please reload to try again.</p>';
   countEl.textContent='';
