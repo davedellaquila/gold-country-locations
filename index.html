@@ -375,7 +375,7 @@ function isSteakhouse(r){
    Sights fitting neither (observatory, museum, lakes, geologic site) carry
    no pill, per Dave's ruling. */
 var OVERLOOK_SLUGS = { 'donnell-vista': 1, 'leavitt-falls-vista-point': 1 };
-var PULLOUT_SLUGS = { 'cape-horn-vista': 1 };
+var PULLOUT_SLUGS = { 'cape-horn-vista': 1, 'sr-4-vista-turnout-at-spicer-meadow-rd': 1 };
 function isOverlook(r){
   if(r._cat!=='sight') return false;
   if(OVERLOOK_SLUGS[r.slug]) return true;
