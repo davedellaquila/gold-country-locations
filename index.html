@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gold Country Locations — Every Place in the Database</title>
+<title>Gold Country Places — Every Place in the Database</title>
 <meta name="description" content="Browse every place in the Gold Country events database: historical markers, wineries, restaurants, diners and sights across the Mother Lode and the Sierra foothills — each with its own page.">
 <link rel="canonical" href="https://locations.fiddletowngazette.com/">
 <meta property="og:type" content="website">
@@ -198,7 +198,7 @@ a[href^="tel:"]{color:inherit;text-decoration:underline;text-decoration-thicknes
 <div class="wrap" id="list-view">
   <div class="hero">
     <div class="hero-brand">
-      <img class="hero-icon" src="/icon-places.svg" alt="Gold Country Locations icon — a gold map pin with a star cut into it" width="72" height="72">
+      <img class="hero-icon" src="/icon-places.svg" alt="Gold CountryPlaces icon — a gold map pin with a star cut into it" width="72" height="72">
       <div>
         <div class="kicker">Gold Country · Places</div>
         <h1>Places of the Gold Country</h1>
@@ -319,7 +319,9 @@ var CATS = [
   {id:'italian', label:'Italian'},
   {id:'steakhouse', label:'Steakhouse'},
   {id:'other', label:'Other'},
-  {id:'sight', label:'Sights & viewpoints'}
+  {id:'sight', label:'Sights & viewpoints'},
+  {id:'overlooks', label:'Scenic overlooks'},
+  {id:'pullouts', label:'Marked pullouts'}
 ];
 var CAT_LABEL = {marker:'Historical marker', winery:'Winery & vineyard', food:'Food, drink & stays', sight:'Sights & viewpoints'};
 var TAGS = {
@@ -363,6 +365,27 @@ function isSteakhouse(r){
   if(/steakhouse/i.test(t) && !/steakhouse[^.!?]{0,60}burgers?\b/i.test(t)) return true;
   return false;
 }
+/* Scenic overlooks + Marked pullouts (Dave, Nov 27, 2026): two sights-side
+   pills. Overlook = a designated scenic overlook / vista / observation site
+   (developed: panels, deck, facilities, a park); Pullout = a marked roadside
+   pullout (signed or inventoried turnout whose substance is parking + view).
+   The Nov 27 pullout entry authored the kind phrase into each new record's
+   short description ("designated scenic overlook" / "marked pullout"); the
+   slug sets cover the pre-existing sights whose text predates the phrases.
+   Sights fitting neither (observatory, museum, lakes, geologic site) carry
+   no pill, per Dave's ruling. */
+var OVERLOOK_SLUGS = { 'donnell-vista': 1, 'leavitt-falls-vista-point': 1 };
+var PULLOUT_SLUGS = { 'cape-horn-vista': 1 };
+function isOverlook(r){
+  if(r._cat!=='sight') return false;
+  if(OVERLOOK_SLUGS[r.slug]) return true;
+  return /scenic overlook/i.test(r.short_description||'');
+}
+function isPullout(r){
+  if(r._cat!=='sight') return false;
+  if(PULLOUT_SLUGS[r.slug]) return true;
+  return /marked (roadside )?pullout/i.test(r.short_description||'');
+}
 /* Asian (Dave, Nov 24): the umbrella over every Asian-cuisine restaurant —
    all of Chinese, plus Japanese/sushi, Thai, Vietnamese, Korean, Indian,
    Nepalese/Himalayan, Laotian, Filipino-led and Mongolian places. Strong
@@ -385,6 +408,8 @@ var TAGFNS = {
   asian: isAsian,
   italian: isItalian,
   steakhouse: isSteakhouse,
+  overlooks: isOverlook,
+  pullouts: isPullout,
   other: function(r){
     if(r._cat!=='food') return false;
     for(var t in TAGS){ if(TAGS[t][r.slug]) return false; }
@@ -580,7 +605,7 @@ function facetTowns(){
   return counts;
 }
 function renderPills(){
-  var counts={all:0, marker:0, winery:0, food:0, sight:0, burger:0, pizza:0, saloon:0, roadhouse:0, chinese:0, asian:0, italian:0, steakhouse:0, other:0};
+  var counts={all:0, marker:0, winery:0, food:0, sight:0, burger:0, pizza:0, saloon:0, roadhouse:0, chinese:0, asian:0, italian:0, steakhouse:0, other:0, overlooks:0, pullouts:0};
   rows.forEach(function(r){ if(state.hideVisited && visited[r.slug]) return; counts.all++; counts[r._cat]++; for(var t in TAGS){ if(TAGS[t][r.slug]) counts[t]++; } for(var f in TAGFNS){ if(TAGFNS[f](r)) counts[f]++; } });
   var html='';
   CATS.forEach(function(c){
